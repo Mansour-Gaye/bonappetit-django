@@ -1,0 +1,15 @@
+# Fichiers Python/Django à ignorer
+__pycache__/
+*.py[cod]
+*.sqlite3
+.env
+
+# Fichiers Django
+/static/
+*.log
+
+# VS Code
+.vscode/
+
+# Virtualenv
+venv/
