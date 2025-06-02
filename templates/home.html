@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Accueil - Bon Appétit{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    <h1 class="display-4">Bienvenue chez Bon Appétit</h1>
+    <p class="lead">Découvrez nos délicieux menus et commandez en ligne !</p>
+    <div class="mt-4">
+        <a href="{% url 'menu' %}" class="btn btn-primary btn-lg">Voir le Menu</a>
+    </div>
+</div>
+{% endblock %} 
