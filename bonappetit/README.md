@@ -1,1 +1,0 @@
-# bonappetit-django
