@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="text-center">Mon Profil</h3>
+        </div>
+        <div class="card-body">
+          <p><strong>Nom d'utilisateur:</strong> {{ user_profile.username }}</p>
+          <p><strong>Email:</strong> {{ user_profile.email }}</p>
+          <p><strong>Prénom:</strong> {{ user_profile.first_name|default:"Non renseigné" }}</p>
+          <p><strong>Nom:</strong> {{ user_profile.last_name|default:"Non renseigné" }}</p>
+
+          {% if user_profile.client %}
+          <hr>
+          <h4>Informations Client</h4>
+          <p><strong>Téléphone:</strong> {{ user_profile.client.telephone|default:"Non renseigné" }}</p>
+          <p><strong>Est client:</strong> {{ user_profile.client.is_client|yesno:"Oui,Non" }}</p>
+          <p><strong>Est gestionnaire:</strong> {{ user_profile.client.is_gestionnaire|yesno:"Oui,Non" }}</p>
+          {% else %}
+          <p class="text-muted">Informations de profil client non disponibles.</p>
+          {% endif %}
+
+          <!-- Add more profile details or an edit link here later -->
+        </div>
+        <div class="card-footer text-center">
+          <a href="#" class="btn btn-primary">Modifier le profil</a> <!-- Placeholder -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
