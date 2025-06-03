@@ -4,7 +4,7 @@
 {% block extra_css %}
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-<link href="{% static 'css/menu.css' %}" rel="stylesheet">
+<link href="{% static 'css/menu.css' %}?v=3" rel="stylesheet">
 {% endblock %}
 
 {% block title %}Menu - Bon Appétit{% endblock %}
@@ -15,7 +15,7 @@
     <div class="container text-center">
         <h1 class="main-title mb-3">Nos Menus</h1>
         <p class="subtitle">Restaurant Bon Appétit</p>
-        <p class="subtitle"><i class="fas fa-utensils me-2"></i></p>
+        <p class="subtitle">"Comme à la maison, en mieux."<i class="fas fa-utensils me-2"></i></p>
     </div>
 </section>
 
@@ -26,25 +26,38 @@
             <h3 class="mb-4" style="color: var(--secondary-color); font-family: 'Playfair Display', serif;">
                 <i class="fas fa-filter me-2"></i>Filtrer par catégorie
             </h3>
-            <div class="d-flex flex-wrap justify-content-center">
-                <button class="filter-btn active" data-filter="all">
-                    <i class="fas fa-th-large category-icon"></i>Tous
-                </button>
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+                <a href="{% url 'menu' %}" class="filter-btn {% if not categorie_active %}active{% endif %}">
+                    <i class="fas fa-th-large category-icon"></i>
+                    <span>Tous</span>
+                </a>
                 {% for categorie in categories %}
-                <button class="filter-btn" data-filter="cat-{{ categorie.id_categorie }}">
-                    <i class="fas fa-utensils category-icon"></i>{{ categorie.nom }}
-                </button>
+                <a href="{% url 'menu' %}?categorie={{ categorie.id_categorie }}" 
+                   class="filter-btn {% if categorie_active.id_categorie == categorie.id_categorie %}active{% endif %}">
+                    <i class="fas fa-utensils category-icon"></i>
+                    <span>{{ categorie.nom }}</span>
+                </a>
                 {% endfor %}
             </div>
         </div>
     </div>
 </div>
 
+<!-- Category Details Section -->
+{% if categorie_active %}
+<div class="container mt-4">
+    <div class="category-details text-center">
+        <h2 class="category-name mb-3">{{ categorie_active.nom }}</h2>
+        <p class="category-description">{{ categorie_active.description|default:"Aucune description disponible" }}</p>
+    </div>
+</div>
+{% endif %}
+
 <!-- Menu Grid -->
 <div class="container mb-5">
-    <div class="row" id="menuGrid">
+    <div class="row g-4" id="menuGrid">
         {% for menu in menus %}
-        <div class="col-lg-4 col-md-6 col-12 menu-item" data-category="cat-{{ menu.categorie.id_categorie }}">
+        <div class="col-lg-4 col-md-6 col-12 menu-item">
             <div class="menu-card">
                 {% if menu.image %}
                 <img src="{{ menu.image.url }}" class="card-img-top" alt="{{ menu.nom }}">
@@ -70,7 +83,5 @@
 </div>
 {% endblock %}
 
-{% block extra_js %}
-<script src="{% static 'js/menu.js' %}"></script>
-{% endblock %}
+{% block extra_js %}{% endblock %}
 
