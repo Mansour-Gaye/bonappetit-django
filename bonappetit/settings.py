@@ -132,4 +132,12 @@ MEDIA_ROOT = BASE_DIR.parent / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Custom user model
+AUTH_USER_MODEL = 'comptes.CustomUser'
+
+# Redirect URLs for login and logout
+LOGIN_REDIRECT_URL = 'comptes:home'
+LOGOUT_REDIRECT_URL = 'comptes:home'
+# LOGIN_URL = 'comptes:login' # If you want to override the default /accounts/login/
+
 DEBUG = True
