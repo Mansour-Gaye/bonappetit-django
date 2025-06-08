@@ -22,6 +22,7 @@ class LigneCommande(models.Model):
     commande = models.ForeignKey(Commande, on_delete=models.CASCADE, related_name="lignes")
     menu = models.ForeignKey(Menu, on_delete=models.CASCADE)
     quantite = models.PositiveIntegerField(default=1)
+
     @property
     def date_commande(self):
         return self.commande.date_commande
