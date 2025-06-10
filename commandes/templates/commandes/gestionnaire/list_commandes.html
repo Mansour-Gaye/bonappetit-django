@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestion des Commandes - Bon Appétit{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Gestion des Commandes</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    {% if commandes %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID Commande</th>
+                <th>Client</th>
+                <th>Date</th>
+                <th>État</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for commande in commandes %}
+            <tr>
+                <td>{{ commande.id }}</td>
+                <td>{{ commande.client.username }}</td>
+                <td>{{ commande.date_commande|date:"d/m/Y H:i" }}</td>
+                <td>{{ commande.get_etat_display }}</td>
+                <td>
+                    <form method="POST" action="{% url 'commandes:update_commande_status' commande.id %}" class="form-inline">
+                        {% csrf_token %}
+                        <select name="etat" class="form-control form-control-sm mr-2">
+                            {% for status_val, status_display in commande.ETAT_CHOICES %}
+                            <option value="{{ status_val }}" {% if commande.etat == status_val %}selected{% endif %}>{{ status_display }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-sm">Modifier Statut</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Aucune commande à afficher.</p>
+    {% endif %}
+</div>
+{% endblock %}

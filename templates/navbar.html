@@ -10,6 +10,18 @@
           <!-- Remplace temporairement ce lien -->
           <a class="nav-link" href="{% url 'menu' %}">Menus</a>
         </li>
+        {% if user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'comptes:logout' %}">Déconnexion</a>
+        </li>
+        {% else %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'comptes:login' %}">Connexion</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'comptes:register' %}">Inscription</a>
+        </li>
+        {% endif %}
       </ul>
     </div>
   </div>

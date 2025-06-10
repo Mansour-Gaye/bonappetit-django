@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Mes Commandes - Bon Appétit{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Mes Commandes</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    {% if commandes %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID Commande</th>
+                <th>Date</th>
+                <th>État</th>
+                <th>Détails</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for commande in commandes %}
+            <tr>
+                <td>{{ commande.id }}</td>
+                <td>{{ commande.date_commande|date:"d/m/Y H:i" }}</td>
+                <td>{{ commande.get_etat_display }}</td>
+                <td><a href="#">Voir détails</a></td> {# Placeholder for individual order view #}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Vous n'avez aucune commande pour le moment.</p>
+    <a href="{% url 'menus:menu_list' %}" class="btn btn-primary">Passer une commande</a> {# Assuming 'menus:menu_list' is the correct URL name for browsing menus #}
+    {% endif %}
+</div>
+{% endblock %}

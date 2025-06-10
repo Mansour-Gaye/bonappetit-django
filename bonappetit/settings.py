@@ -101,6 +101,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+SESSION_COOKIE_AGE = 30 * 60  # 30 minutes
+SESSION_SAVE_EVERY_REQUEST = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
@@ -137,7 +139,7 @@ AUTH_USER_MODEL = 'comptes.CustomUser'
 
 # Redirect URLs for login and logout
 LOGIN_REDIRECT_URL = 'comptes:home'
-LOGOUT_REDIRECT_URL = 'comptes:home'
+LOGOUT_REDIRECT_URL = 'comptes:login'
 # LOGIN_URL = 'comptes:login' # If you want to override the default /accounts/login/
 
 DEBUG = True

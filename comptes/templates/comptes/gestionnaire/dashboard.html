@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard Gestionnaire - Bon Appétit{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Dashboard Gestionnaire</h1>
+    <p>Bienvenue, {{ user.username }}!</p>
+
+    <h2>Statistiques Récentes</h2>
+    <ul>
+        <li>Nombre total de commandes: (Statistique à venir)</li>
+        <li>Chiffre d'affaires total: (Statistique à venir)</li>
+        <li>Nombre de clients inscrits: (Statistique à venir)</li>
+    </ul>
+
+    <h2>Actions Rapides</h2>
+    <ul>
+        <li><a href="{% url 'commandes:list_all_commandes' %}">Gérer les commandes</a></li>
+        <li><a href="#">Gérer les menus</a></li>
+        <li><a href="#">Voir les utilisateurs</a></li>
+    </ul>
+</div>
+{% endblock %}
