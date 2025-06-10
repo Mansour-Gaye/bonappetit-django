@@ -1,24 +1,200 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
 
 {% block title %}Dashboard Gestionnaire - Bon Appétit{% endblock %}
 
+{% block extra_css %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<style>
+    .stat-card {
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    .stat-icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    .stat-label {
+        color: #666;
+        font-size: 0.9rem;
+    }
+    .recent-activity {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    .management-buttons {
+        margin-bottom: 2rem;
+    }
+    .management-button {
+        padding: 1rem;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+    .management-button:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
-    <h1>Dashboard Gestionnaire</h1>
-    <p>Bienvenue, {{ user.username }}!</p>
+    <h1 class="mb-4">Dashboard Gestionnaire</h1>
+    <p class="lead mb-4">Bienvenue, {{ user.username }}!</p>
 
-    <h2>Statistiques Récentes</h2>
-    <ul>
-        <li>Nombre total de commandes: (Statistique à venir)</li>
-        <li>Chiffre d'affaires total: (Statistique à venir)</li>
-        <li>Nombre de clients inscrits: (Statistique à venir)</li>
-    </ul>
+    <!-- Boutons de gestion -->
+    <div class="row management-buttons">
+        <div class="col-md-4">
+            <a href="{% url 'comptes:gestion_utilisateurs' %}" class="btn btn-primary w-100 management-button">
+                <i class="fas fa-users fa-2x mb-2"></i>
+                <h4>Gestion des Utilisateurs</h4>
+                <p class="mb-0">Gérer les comptes clients et gestionnaires</p>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="#" class="btn btn-success w-100 management-button">
+                <i class="fas fa-shopping-cart fa-2x mb-2"></i>
+                <h4>Gestion des Commandes</h4>
+                <p class="mb-0">Suivre et gérer les commandes</p>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="#" class="btn btn-info w-100 management-button">
+                <i class="fas fa-utensils fa-2x mb-2"></i>
+                <h4>Gestion des Menus</h4>
+                <p class="mb-0">Gérer le catalogue des menus</p>
+            </a>
+        </div>
+    </div>
 
-    <h2>Actions Rapides</h2>
-    <ul>
-        <li><a href="{% url 'commandes:list_all_commandes' %}">Gérer les commandes</a></li>
-        <li><a href="#">Gérer les menus</a></li>
-        <li><a href="#">Voir les utilisateurs</a></li>
-    </ul>
+    <!-- Statistiques des Commandes -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-3">Statistiques des Commandes</h2>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-primary text-white">
+                <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+                <div class="stat-value">{{ commandes_stats.total }}</div>
+                <div class="stat-label">Total des Commandes</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-success text-white">
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-value">{{ commandes_stats.terminees }}</div>
+                <div class="stat-label">Commandes Terminées</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-warning text-white">
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                <div class="stat-value">{{ commandes_stats.en_cours }}</div>
+                <div class="stat-label">Commandes en Cours</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-info text-white">
+                <div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div>
+                <div class="stat-value">{{ commandes_stats.chiffre_affaires }} FCFA</div>
+                <div class="stat-label">Chiffre d'Affaires</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques des Utilisateurs -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-3">Statistiques des Utilisateurs</h2>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-secondary text-white">
+                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                <div class="stat-value">{{ users_stats.total }}</div>
+                <div class="stat-label">Total Utilisateurs</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-info text-white">
+                <div class="stat-icon"><i class="fas fa-user"></i></div>
+                <div class="stat-value">{{ users_stats.clients }}</div>
+                <div class="stat-label">Clients</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-warning text-white">
+                <div class="stat-icon"><i class="fas fa-user-tie"></i></div>
+                <div class="stat-value">{{ users_stats.gestionnaires }}</div>
+                <div class="stat-label">Gestionnaires</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-success text-white">
+                <div class="stat-icon"><i class="fas fa-user-plus"></i></div>
+                <div class="stat-value">{{ users_stats.nouveaux }}</div>
+                <div class="stat-label">Nouveaux (30j)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Commandes Récentes et Notifications -->
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Commandes Récentes</h3>
+                </div>
+                <div class="card-body recent-activity">
+                    {% for commande in commandes_recentes %}
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h5 class="mb-1">Commande #{{ commande.id }}</h5>
+                            <p class="mb-0 text-muted">
+                                Client: {{ commande.client.username }} | 
+                                Montant: {% for ligne in commande.lignes.all %}{{ ligne.menu.prix|multiply:ligne.quantite }}{% if not forloop.last %} + {% endif %}{% endfor %} FCFA
+                            </p>
+                        </div>
+                        <span class="badge bg-{{ commande.etat|lower }}">
+                            {{ commande.etat }}
+                        </span>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">Aucune commande récente</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Notifications</h3>
+                </div>
+                <div class="card-body recent-activity">
+                    {% for notification in notifications %}
+                    <div class="d-flex align-items-start mb-3">
+                        <i class="{{ notification.icon }} me-2"></i>
+                        <div>
+                            <p class="mb-0">{{ notification.message }}</p>
+                            <small class="text-muted">{{ notification.created_at|timesince }}</small>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">Aucune notification</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

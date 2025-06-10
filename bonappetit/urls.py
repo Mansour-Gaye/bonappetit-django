@@ -23,7 +23,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home, name='home'), # Root home page
     path('comptes/', include('comptes.urls')), # Authentication app URLs
-    path('menu/', include('menus.urls'))
+    path('menu/', include('menus.urls')),
+    path('commandes/', include('commandes.urls')), # Commandes app URLs
 ]
 
 if settings.DEBUG:

@@ -137,6 +137,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Custom user model
 AUTH_USER_MODEL = 'comptes.CustomUser'
 
+# CSRF settings
+CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
+CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript access to the token
+CSRF_USE_SESSIONS = False  # Use cookies instead of sessions
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
+
 # Redirect URLs for login and logout
 LOGIN_REDIRECT_URL = 'comptes:home'
 LOGOUT_REDIRECT_URL = 'comptes:login'

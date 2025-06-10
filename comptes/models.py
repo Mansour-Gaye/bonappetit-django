@@ -32,13 +32,33 @@ class CustomUser(AbstractUser):
         return self.username
 
 class Notification(models.Model):
+    TYPE_CHOICES = [
+        ('commande', 'Commande'),
+        ('systeme', 'Système'),
+        ('promo', 'Promotion'),
+    ]
+    
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
     message = models.TextField()
+    type_notification = models.CharField(max_length=20, choices=TYPE_CHOICES, default='systeme')
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    link = models.CharField(max_length=255, blank=True, null=True)  # Pour rediriger vers une page spécifique
+    icon = models.CharField(max_length=50, default='fas fa-bell')  # Classe FontAwesome pour l'icône
 
     def __str__(self):
-        return f"Notification for {self.user.username}: {self.message[:30]}"
+        return f"Notification pour {self.user.username}: {self.message[:30]}"
 
     class Meta:
         ordering = ['-created_at']
+        
+    @classmethod
+    def create_notification(cls, user, message, type_notification='systeme', link=None, icon=None):
+        """Méthode utilitaire pour créer une notification"""
+        return cls.objects.create(
+            user=user,
+            message=message,
+            type_notification=type_notification,
+            link=link,
+            icon=icon or cls._meta.get_field('icon').default
+        )

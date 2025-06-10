@@ -1,5 +1,7 @@
 # Create your views here.
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from .models import Menu, Categorie
 
 # Create your views here.
@@ -27,3 +29,11 @@ def detail_menu(request, id_menu):
         'menu': menu
     }
     return render(request, 'menus/detail_menu.html', context)
+
+@login_required(login_url='comptes:login')
+def ajouter_au_panier(request, id_menu):
+    menu = get_object_or_404(Menu, id_menu=id_menu)
+    # Ici, vous pouvez ajouter la logique pour ajouter au panier
+    # Pour l'instant, on redirige vers la page du menu avec un message
+    messages.success(request, f'Le menu "{menu.nom}" a été ajouté à votre panier.')
+    return redirect('menus:menu')

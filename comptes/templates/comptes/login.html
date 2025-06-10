@@ -8,7 +8,7 @@
         <h2 class="card-title text-center">Connexion</h2>
       </div>
       <div class="card-body">
-        <form method="post">
+        <form method="post" action="{% url 'comptes:login' %}" id="login-form">
           {% csrf_token %}
           {{ form.non_field_errors }}
 
@@ -38,9 +38,44 @@
         </form>
       </div>
       <div class="card-footer text-center">
-        <p class="mb-0">Pas encore de compte ? <a href="{% url 'register' %}">S'inscrire</a></p>
+        <p class="mb-0">Pas encore de compte ? <a href="{% url 'comptes:register' %}">S'inscrire</a></p>
       </div>
     </div>
   </div>
 </div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('login-form');
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        formData.append('csrfmiddlewaretoken', csrfToken);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin',
+            headers: {
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+            } else {
+                return response.json();
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+        });
+    });
+});
+</script>
+{% endblock %}
 {% endblock %}

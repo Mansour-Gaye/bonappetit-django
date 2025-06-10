@@ -68,11 +68,11 @@
                     <!-- Boutons d'action -->
                     <div class="d-grid gap-2">
                         {% if menu.disponible %}
-                        <button class="btn btn-cart">
+                        <a href="{% url 'menus:ajouter_au_panier' menu.id_menu %}" class="btn btn-cart">
                             <i class="fas fa-shopping-cart me-2"></i>Ajouter au panier
-                        </button>
+                        </a>
                         {% endif %}
-                        <a href="{% url 'menu' %}" class="btn btn-outline-secondary">
+                        <a href="{% url 'menus:menu' %}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left me-2"></i>Retour au menu
                         </a>
                     </div>
