@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link href="{% static 'css/menu.css' %}?v=3" rel="stylesheet">
+{% endblock %}
+
+{% block title %}Modifier le Menu - Bon Appétit{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <h3 class="mb-0"><i class="fas fa-edit me-2"></i>Modifier le menu</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="form-group mb-3">
+                            <label for="{{ form.nom.id_for_label }}" class="form-label">Nom du menu *</label>
+                            {{ form.nom }}
+                            {% if form.nom.errors %}
+                                <div class="text-danger">{{ form.nom.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">Description *</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger">{{ form.description.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.prix.id_for_label }}" class="form-label">Prix (FCFA) *</label>
+                                    {{ form.prix }}
+                                    {% if form.prix.errors %}
+                                        <div class="text-danger">{{ form.prix.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.categorie.id_for_label }}" class="form-label">Catégorie *</label>
+                                    {{ form.categorie }}
+                                    {% if form.categorie.errors %}
+                                        <div class="text-danger">{{ form.categorie.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="{{ form.image.id_for_label }}" class="form-label">Image du menu</label>
+                            {% if menu.image %}
+                            <div class="mb-2">
+                                <img src="{{ menu.image.url }}" alt="{{ menu.nom }}" class="img-thumbnail" style="max-height: 200px;">
+                            </div>
+                            {% endif %}
+                            {{ form.image }}
+                            <small class="form-text text-muted">Formats acceptés: JPG, PNG. Taille max: 5MB</small>
+                            {% if form.image.errors %}
+                                <div class="text-danger">{{ form.image.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <div class="form-check">
+                                {{ form.disponible }}
+                                <label class="form-check-label" for="{{ form.disponible.id_for_label }}">
+                                    Menu disponible à la commande
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group d-flex justify-content-between">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save me-2"></i>Enregistrer les modifications
+                            </button>
+                            <a href="{% url 'menus:gestion_menus' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

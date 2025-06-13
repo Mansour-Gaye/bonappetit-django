@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestion des Commandes - Bon Appétit{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Gestion des Commandes</h1>
+
+    <!-- Formulaire de filtrage -->
+    <form method="get" class="row g-2 mb-4 align-items-end">
+        <div class="col-md-3">
+            <label for="etat" class="form-label">État</label>
+            <select name="etat" id="etat" class="form-select">
+                <option value="">Tous</option>
+                {% for val, label in ETAT_CHOICES %}
+                <option value="{{ val }}" {% if etat == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="client" class="form-label">Client</label>
+            <input type="text" name="client" id="client" class="form-control" value="{{ client|default:'' }}" placeholder="Nom d'utilisateur">
+        </div>
+        <div class="col-md-2">
+            <label for="date_min" class="form-label">Date min</label>
+            <input type="date" name="date_min" id="date_min" class="form-control" value="{{ date_min|default:'' }}">
+        </div>
+        <div class="col-md-2">
+            <label for="date_max" class="form-label">Date max</label>
+            <input type="date" name="date_max" id="date_max" class="form-control" value="{{ date_max|default:'' }}">
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+        </div>
+    </form>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    {% if commandes %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID Commande</th>
+                <th>Client</th>
+                <th>Date</th>
+                <th>État</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for commande in commandes %}
+            <tr>
+                <td>{{ commande.id }}</td>
+                <td>{{ commande.client.username }}</td>
+                <td>{{ commande.date_commande|date:"d/m/Y H:i" }}</td>
+                <td>
+                    <span class="badge 
+                        {% if commande.etat == 'EN_ATTENTE' %}bg-warning text-dark
+                        {% elif commande.etat == 'EN_PREPARATION' %}bg-info text-white
+                        {% elif commande.etat == 'PRETE' %}bg-success text-white
+                        {% elif commande.etat == 'RETIREE' %}bg-primary text-white
+                        {% elif commande.etat == 'ANNULEE' %}bg-danger text-white
+                        {% endif %}">
+                        {{ commande.get_etat_display }}
+                    </span>
+                </td>
+                <td>
+                    <form method="POST" action="{% url 'commandes:update_commande_status' commande.id %}" class="d-inline">
+                        {% csrf_token %}
+                        {% if commande.etat == 'EN_ATTENTE' %}
+                            <input type="hidden" name="etat" value="EN_PREPARATION">
+                            <button type="submit" class="btn btn-sm btn-info">Passer en préparation</button>
+                        {% elif commande.etat == 'EN_PREPARATION' %}
+                            <input type="hidden" name="etat" value="PRETE">
+                            <button type="submit" class="btn btn-sm btn-success">Marquer comme prête</button>
+                        {% elif commande.etat == 'PRETE' %}
+                            <input type="hidden" name="etat" value="RETIREE">
+                            <button type="submit" class="btn btn-sm btn-primary">Marquer comme retirée</button>
+                        {% else %}
+                            <span class="text-muted">Aucune action</span>
+                        {% endif %}
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Aucune commande à afficher.</p>
+    {% endif %}
+</div>
+{% endblock %}

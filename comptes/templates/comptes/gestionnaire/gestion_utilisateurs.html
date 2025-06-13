@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gestion des Utilisateurs - Bon Appétit{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<style>
+    .user-card {
+        transition: transform 0.2s;
+    }
+    .user-card:hover {
+        transform: translateY(-5px);
+    }
+    .search-box {
+        max-width: 500px;
+        margin: 0 auto 2rem;
+    }
+    .filter-buttons {
+        margin-bottom: 1.5rem;
+    }
+    .user-actions {
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+    .user-card:hover .user-actions {
+        opacity: 1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Gestion des Utilisateurs</h1>
+
+    <!-- Barre de recherche -->
+    <div class="search-box">
+        <form method="get" class="d-flex gap-2">
+            <input type="text" name="search" class="form-control" placeholder="Rechercher un utilisateur..." value="{{ request.GET.search }}">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i>
+            </button>
+        </form>
+    </div>
+
+    <!-- Filtres -->
+    <div class="filter-buttons text-center">
+        <div class="btn-group" role="group">
+            <a href="?role=all" class="btn btn-outline-primary {% if request.GET.role == 'all' or not request.GET.role %}active{% endif %}">
+                Tous
+            </a>
+            <a href="?role=client" class="btn btn-outline-primary {% if request.GET.role == 'client' %}active{% endif %}">
+                Clients
+            </a>
+            <a href="?role=gestionnaire" class="btn btn-outline-primary {% if request.GET.role == 'gestionnaire' %}active{% endif %}">
+                Gestionnaires
+            </a>
+        </div>
+    </div>
+
+    <!-- Liste des utilisateurs -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for user in users %}
+        <div class="col">
+            <div class="card h-100 user-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h5 class="card-title mb-1">{{ user.username }}</h5>
+                            <p class="card-text text-muted mb-0">
+                                <small>
+                                    <i class="fas fa-envelope me-1"></i>{{ user.email }}
+                                </small>
+                            </p>
+                        </div>
+                        <span class="badge {% if user.is_gestionnaire %}bg-primary{% else %}bg-success{% endif %}">
+                            {% if user.is_gestionnaire %}Gestionnaire{% else %}Client{% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="card-text">
+                        <p class="mb-2">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            Inscrit le {{ user.date_joined|date:"d/m/Y" }}
+                        </p>
+                        <p class="mb-2">
+                            <i class="fas fa-clock me-2"></i>
+                            Dernière connexion : {{ user.last_login|date:"d/m/Y H:i"|default:"Jamais" }}
+                        </p>
+                    </div>
+
+                    <div class="user-actions mt-3">
+                        <div class="btn-group w-100">
+                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editUserModal{{ user.id }}">
+                                <i class="fas fa-edit"></i> Modifier
+                            </button>
+                            {% if not user.is_gestionnaire %}
+                            <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#promoteUserModal{{ user.id }}">
+                                <i class="fas fa-user-plus"></i> Promouvoir
+                            </button>
+                            {% endif %}
+                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal{{ user.id }}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de modification -->
+        <div class="modal fade" id="editUserModal{{ user.id }}" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Modifier l'utilisateur</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form method="post" action="{% url 'comptes:edit_user' user.id %}">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Nom d'utilisateur</label>
+                                <input type="text" class="form-control" name="username" value="{{ user.username }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" name="email" value="{{ user.email }}">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de promotion -->
+        <div class="modal fade" id="promoteUserModal{{ user.id }}" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Promouvoir en gestionnaire</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Êtes-vous sûr de vouloir promouvoir {{ user.username }} en gestionnaire ?</p>
+                        <p class="text-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Cette action donnera à l'utilisateur accès au dashboard gestionnaire.
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <form method="post" action="{% url 'comptes:promote_user' user.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">Confirmer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de suppression -->
+        <div class="modal fade" id="deleteUserModal{{ user.id }}" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Supprimer l'utilisateur</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Êtes-vous sûr de vouloir supprimer l'utilisateur {{ user.username }} ?</p>
+                        <p class="text-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Cette action est irréversible.
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <form method="post" action="{% url 'comptes:delete_user' user.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Supprimer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                Aucun utilisateur trouvé.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if users.has_other_pages %}
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if users.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ users.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}">
+                    Précédent
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in users.paginator.page_range %}
+            <li class="page-item {% if users.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}">
+                    {{ num }}
+                </a>
+            </li>
+            {% endfor %}
+
+            {% if users.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ users.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}">
+                    Suivant
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %} 

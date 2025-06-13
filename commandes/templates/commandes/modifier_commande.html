@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Modifier Commande - Bon Appétit{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Modifier Commande #{{ commande.id }}</h1>
+    <p>La fonctionnalité de modification de commande sera implémentée ici si applicable.</p>
+    <p>État actuel: {{ commande.get_etat_display }}</p>
+    <!-- Add a link back to client's order list -->
+    <a href="{% url 'commandes:liste_commandes_client' %}" class="btn btn-secondary">Retour à mes commandes</a>
+</div>
+{% endblock %}

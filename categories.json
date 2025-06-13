@@ -1,0 +1,38 @@
+[
+{
+  "model": "menus.categorie",
+  "pk": 1,
+  "fields": {
+    "nom": "Plats",
+    "description": "Nos plats principaux sont le cœur de notre cuisine : généreux, authentiques et inspirés des saveurs du monde. Chaque assiette est une invitation à la découverte, préparée avec passion et des produits de qualité.",
+    "ordre_affichage": 2
+  }
+},
+{
+  "model": "menus.categorie",
+  "pk": 2,
+  "fields": {
+    "nom": "Entrées",
+    "description": "Commencez votre voyage culinaire en douceur avec nos entrées savoureuses, pensées pour éveiller vos papilles. Fraîcheur, finesse et équilibre sont les maîtres-mots de cette première escale gourmande.",
+    "ordre_affichage": 1
+  }
+},
+{
+  "model": "menus.categorie",
+  "pk": 3,
+  "fields": {
+    "nom": "Desserts",
+    "description": "Terminez votre repas sur une note sucrée avec nos desserts faits maison. Qu’il s’agisse de classiques revisités ou de créations originales, chaque bouchée promet un instant de pur plaisir.",
+    "ordre_affichage": 3
+  }
+},
+{
+  "model": "menus.categorie",
+  "pk": 4,
+  "fields": {
+    "nom": "Boissons",
+    "description": "ccompagnez votre repas avec notre sélection de boissons : jus frais, cocktails maison, sodas artisanaux ou vins soigneusement choisis. Il y en a pour tous les goûts et toutes les envies.",
+    "ordre_affichage": 4
+  }
+}
+]

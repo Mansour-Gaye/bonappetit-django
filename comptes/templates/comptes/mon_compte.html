@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Mon Compte - Bon Appétit{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Mon Compte</h1>
+    <p>Bienvenue sur votre espace personnel, {{ user.username }}!</p>
+
+    <h2>Mes Informations</h2>
+    <ul>
+        <li>Nom d'utilisateur: {{ user.username }}</li>
+        <li>Email: {{ user.email }}</li>
+        <li>Téléphone: {{ user.phone|default:"Non fourni" }}</li>
+    </ul>
+
+    <h2>Historique des Commandes</h2>
+    <p>(L'historique des commandes apparaîtra ici.)</p>
+
+    <h2>Notifications</h2>
+    <div id="notifications-section">
+        {% if unread_notifications %}
+            <ul class="list-group mb-3">
+                {% for notification in unread_notifications %}
+                    <li class="list-group-item">
+                        {{ notification.message }}
+                        <small class="text-muted"> ({{ notification.created_at|timesince }} ago)</small>
+                        {# Add a form/link to mark as read if desired in future #}
+                        {# <a href="{% url 'comptes:mark_notification_read' notification.id %}" class="btn btn-sm btn-outline-secondary float-right">Marquer comme lue</a> #}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Vous n'avez aucune nouvelle notification.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link href="{% static 'css/menu.css' %}?v=3" rel="stylesheet">
+{% endblock %}
+
+{% block title %}Supprimer le Menu - Bon Appétit{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Confirmer la suppression</h3>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Êtes-vous sûr de vouloir supprimer le menu suivant ?</p>
+                    
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ menu.nom }}</h5>
+                            <p class="card-text">{{ menu.description }}</p>
+                            <p class="card-text">
+                                <strong>Prix: {{ menu.prix }} FCFA</strong><br>
+                                <small class="text-muted">Catégorie: {{ menu.categorie.nom }}</small>
+                            </p>
+                            {% if menu.image %}
+                            <img src="{{ menu.image.url }}" alt="{{ menu.nom }}" class="img-thumbnail" style="max-height: 200px;">
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>Attention :</strong> Cette action est irréversible !
+                    </div>
+                    
+                    <form method="post" class="d-flex justify-content-between">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-2"></i>Oui, supprimer définitivement
+                        </button>
+                        <a href="{% url 'menus:gestion_menus' %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Non, annuler
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

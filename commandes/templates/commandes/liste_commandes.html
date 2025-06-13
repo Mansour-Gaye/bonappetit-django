@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Mes Commandes - Bon Appétit{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Mes Commandes</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    {% if commandes %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID Commande</th>
+                <th>Date</th>
+                <th>Montant total</th>
+                <th>Actions</th>
+                <th>Détails</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for commande in commandes %}
+            <tr>
+                <td>{{ commande.id }}</td>
+                <td>{{ commande.date_commande|date:"d/m/Y H:i" }}</td>
+                <td>{{ commande.montant_total }} FCFA</td>
+                <td>
+                    <span class="badge 
+                        {% if commande.etat == 'EN_ATTENTE' %}bg-warning text-dark
+                        {% elif commande.etat == 'EN_PREPARATION' %}bg-info text-white
+                        {% elif commande.etat == 'PRETE' %}bg-success text-white
+                        {% elif commande.etat == 'ANNULEE' %}bg-danger text-white
+                        {% endif %}">
+                        {{ commande.get_etat_display }}
+                    </span>
+                    {% if commande.etat == 'EN_ATTENTE' %}
+                        <button class="btn btn-sm btn-outline-danger ms-2 btn-annuler-commande" data-id="{{ commande.id }}">Annuler</button>
+                    {% endif %}
+                </td>
+                <td><a href="{% url 'commandes:detail_commande' commande.id %}">Voir détails</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Vous n'avez aucune commande pour le moment.</p>
+    <a href="{% url 'menus:menu' %}" class="btn btn-primary">Passer une commande</a>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.btn-annuler-commande').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            if (confirm('Voulez-vous vraiment annuler cette commande ?')) {
+                fetch(`/commandes/annuler/${btn.dataset.id}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Commande annulée avec succès.');
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Erreur lors de l\'annulation.');
+                    }
+                })
+                .catch(() => {
+                    alert('Erreur lors de l\'annulation.');
+                });
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link href="{% static 'css/menu.css' %}?v=3" rel="stylesheet">
+{% endblock %}
+
+{% block title %}Gestion des Menus - Bon Appétit{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Gestion des Menus</h2>
+        <div>
+            <a href="{% url 'menus:ajouter_menu' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Ajouter un menu
+            </a>
+            <a href="{% url 'menus:gestion_categories' %}" class="btn btn-secondary">
+                <i class="fas fa-tags"></i> Gérer les catégories
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtres et recherche -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row">
+                <div class="col-md-6">
+                    <input type="text" name="search" class="form-control" placeholder="Rechercher un menu..." value="{{ search }}">
+                </div>
+                <div class="col-md-4">
+                    <select name="categorie" class="form-control">
+                        <option value="">Toutes les catégories</option>
+                        {% for categorie in categories %}
+                        <option value="{{ categorie.id_categorie }}" {% if categorie.id_categorie == categorie_selectionnee %}selected{% endif %}>
+                            {{ categorie.nom }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-outline-primary btn-block">Filtrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Liste des menus -->
+    <div class="row">
+        {% for menu in page_obj %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+                {% if menu.image %}
+                <img src="{{ menu.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ menu.nom }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ menu.nom }}</h5>
+                    <p class="card-text">{{ menu.description|truncatewords:10 }}</p>
+                    <p class="card-text">
+                        <strong>Prix: {{ menu.prix }} FCFA</strong><br>
+                        <small class="text-muted">Catégorie: {{ menu.categorie.nom }}</small>
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge {% if menu.disponible %}bg-success{% else %}bg-danger{% endif %}">
+                            {% if menu.disponible %}Disponible{% else %}Indisponible{% endif %}
+                        </span>
+                        <small class="text-muted">Modifié le {{ menu.date_modification|date:"d/m/Y" }}</small>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="btn-group btn-group-sm w-100" role="group">
+                        <a href="{% url 'menus:modifier_menu' menu.id_menu %}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Modifier
+                        </a>
+                        <a href="{% url 'menus:toggle_disponibilite' menu.id_menu %}" class="btn btn-{% if menu.disponible %}secondary{% else %}success{% endif %}">
+                            <i class="fas fa-{% if menu.disponible %}times{% else %}check{% endif %}"></i>
+                            {% if menu.disponible %}Désactiver{% else %}Activer{% endif %}
+                        </a>
+                        <a href="{% url 'menus:supprimer_menu' menu.id_menu %}" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <h4>Aucun menu trouvé</h4>
+                <p>{% if search %}Aucun menu ne correspond à votre recherche.{% else %}Commencez par ajouter votre premier menu !{% endif %}</p>
+                <a href="{% url 'menus:ajouter_menu' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Ajouter un menu
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="Navigation des pages">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if categorie_selectionnee %}&categorie={{ categorie_selectionnee }}{% endif %}">
+                    <i class="fas fa-chevron-left"></i> Précédent
+                </a>
+            </li>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if categorie_selectionnee %}&categorie={{ categorie_selectionnee }}{% endif %}">{{ num }}</a>
+            </li>
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if categorie_selectionnee %}&categorie={{ categorie_selectionnee }}{% endif %}">
+                    Suivant <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %} 

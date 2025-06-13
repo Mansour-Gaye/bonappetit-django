@@ -1,0 +1,355 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load menu_extras %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link href="{% static 'css/menu.css' %}?v=3" rel="stylesheet">
+<style>
+    .menu-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    .btn-cart {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-weight: 600;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .btn-cart:hover {
+        background-color: #218838;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .btn-cart i {
+        margin-right: 8px;
+    }
+    .btn-detail {
+        background-color: #f8f9fa;
+        color: #333;
+        border: 1px solid #ddd;
+        padding: 10px 20px;
+        font-weight: 600;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+    .btn-detail:hover {
+        background-color: #e9ecef;
+        color: #333;
+    }
+    .menu-card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+        background: white;
+    }
+    .menu-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .menu-image {
+        height: 200px;
+        object-fit: cover;
+    }
+    .menu-content {
+        padding: 1.5rem;
+    }
+    .menu-title {
+        font-family: 'Playfair Display', serif;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+    .menu-description {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+    .menu-price {
+        color: #e67e22;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+    .menu-category {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(44, 62, 80, 0.9);
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+    }
+    .filter-section {
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .filter-btn {
+        border: 2px solid #e67e22;
+        color: #e67e22;
+        background: transparent;
+        padding: 0.5rem 1.5rem;
+        border-radius: 25px;
+        margin: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    .filter-btn:hover, .filter-btn.active {
+        background: #e67e22;
+        color: white;
+    }
+    .add-to-cart-btn {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .add-to-cart-btn:hover {
+        background-color: #218838;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .details-btn {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .details-btn:hover {
+        background-color: #5a6268;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .alert {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1050;
+        min-width: 300px;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block title %}Menu - Bon Appétit{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<section class="header-section">
+    <div class="container text-center">
+        <h1 class="main-title mb-3">Nos Menus</h1>
+        <p class="subtitle">Restaurant Bon Appétit</p>
+        <p class="subtitle">"Comme à la maison, en mieux."<i class="fas fa-utensils me-2"></i></p>
+    </div>
+</section>
+
+<!-- Filter Section (nouvelle version) -->
+<div class="container my-4">
+    <div class="d-flex flex-wrap justify-content-center gap-2">
+        <a href="{% url 'menus:menu' %}" class="btn filter-btn {% if not categorie_active %}active{% endif %}">
+            <i class="fas fa-th-large category-icon"></i> Tous
+        </a>
+        {% for categorie in categories %}
+        <a href="{% url 'menus:menu' %}?categorie={{ categorie.id_categorie }}" class="btn filter-btn {% if categorie_active and categorie_active.id_categorie == categorie.id_categorie %}active{% endif %}">
+            <i class="fas fa-utensils category-icon"></i> {{ categorie.nom }}
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Menu Grid -->
+<div class="container mb-5">
+    {% if categorie_active %}
+        <!-- Afficher les menus de la catégorie sélectionnée -->
+        <div class="category-section mb-5">
+            <div class="category-header text-center mb-4">
+                <h2 class="category-title">{{ categorie_active.nom }}</h2>
+                <p class="category-description">{{ categorie_active.description|default:"Aucune description disponible" }}</p>
+            </div>
+            <div class="row g-4">
+                {% for menu in page_obj %}
+                    {% if menu.disponible %}
+                    <div class="col-lg-4 col-md-6 col-12 menu-item">
+                        <div class="menu-card">
+                            {% if menu.image %}
+                            <img src="{{ menu.image.url }}" class="card-img-top menu-image" alt="{{ menu.nom }}">
+                            {% else %}
+                            <img src="{% static 'images/placeholder-menu.jpg' %}" class="card-img-top menu-image" alt="{{ menu.nom }}">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="menu-title">{{ menu.nom }}</h5>
+                                <div class="price mb-3">{{ menu.prix }} FCFA</div>
+                                <div class="menu-actions">
+                                    <a href="{% url 'menus:detail_menu' menu.id_menu %}" class="btn btn-detail flex-grow-1">
+                                        <i class="fas fa-info-circle me-2"></i>Détails
+                                    </a>
+                                    <form method="post" action="{% url 'commandes:ajouter_au_panier' menu.id_menu %}" class="flex-grow-1 add-to-cart-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="menu_id" value="{{ menu.id_menu }}">
+                                        <input type="hidden" name="quantite" value="1">
+                                        <button type="submit" class="btn btn-cart w-100">
+                                            <i class="fas fa-shopping-cart"></i>Ajouter au panier
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% empty %}
+                <div class="col-12 text-center py-5">
+                    <h3>Aucun menu disponible dans cette catégorie</h3>
+                    <p>Revenez bientôt pour découvrir nos nouveaux menus !</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <!-- Afficher tous les menus groupés par catégorie -->
+        {% for categorie in categories %}
+            {% with menus_categorie=page_obj|filter_by_categorie:categorie %}
+            {% if menus_categorie %}
+            <div class="category-section mb-5">
+                <div class="category-header text-center mb-4">
+                    <h2 class="category-title">{{ categorie.nom }}</h2>
+                    <p class="category-description">{{ categorie.description|default:"Aucune description disponible" }}</p>
+                </div>
+                <div class="row g-4">
+                    {% for menu in menus_categorie %}
+                        {% if menu.disponible %}
+                        <div class="col-lg-4 col-md-6 col-12 menu-item">
+                            <div class="menu-card">
+                                {% if menu.image %}
+                                <img src="{{ menu.image.url }}" class="card-img-top menu-image" alt="{{ menu.nom }}">
+                                {% else %}
+                                <img src="{% static 'images/placeholder-menu.jpg' %}" class="card-img-top menu-image" alt="{{ menu.nom }}">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="menu-title">{{ menu.nom }}</h5>
+                                    <div class="price mb-3">{{ menu.prix }} FCFA</div>
+                                    <div class="menu-actions">
+                                        <a href="{% url 'menus:detail_menu' menu.id_menu %}" class="btn btn-detail flex-grow-1">
+                                            <i class="fas fa-info-circle me-2"></i>Détails
+                                        </a>
+                                        <form method="post" action="{% url 'commandes:ajouter_au_panier' menu.id_menu %}" class="flex-grow-1 add-to-cart-form">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="menu_id" value="{{ menu.id_menu }}">
+                                            <input type="hidden" name="quantite" value="1">
+                                            <button type="submit" class="btn btn-cart w-100">
+                                                <i class="fas fa-shopping-cart"></i>Ajouter au panier
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            {% endwith %}
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gérer les formulaires d'ajout au panier
+    const forms = document.querySelectorAll('.add-to-cart-form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Ajout en cours...';
+
+            // Récupérer le menu_id depuis l'input caché
+            const menuId = this.querySelector('input[name="menu_id"]').value;
+            // Toujours ajouter 1 (ou tu peux faire dynamique si tu veux)
+            const quantite = parseInt(this.querySelector('input[name="quantite"]').value) || 1;
+
+            fetch(this.action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({ quantite: quantite })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.dispatchEvent(new Event('cartUpdated'));
+                    const alert = document.createElement('div');
+                    alert.className = 'alert alert-success alert-dismissible fade show';
+                    alert.innerHTML = `
+                        Menu ajouté au panier !
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    document.body.appendChild(alert);
+                    setTimeout(() => { alert.remove(); }, 3000);
+                } else {
+                    const alert = document.createElement('div');
+                    alert.className = 'alert alert-danger alert-dismissible fade show';
+                    alert.innerHTML = `
+                        ${data.message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    document.body.appendChild(alert);
+                    setTimeout(() => { alert.remove(); }, 3000);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-danger alert-dismissible fade show';
+                alert.innerHTML = `
+                    Une erreur est survenue lors de l'ajout au panier.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.body.appendChild(alert);
+                setTimeout(() => { alert.remove(); }, 3000);
+            })
+            .finally(() => {
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalText;
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
+

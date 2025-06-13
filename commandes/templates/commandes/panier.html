@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<style>
+    .cart-item {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        padding: 20px;
+    }
+    .cart-item img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 5px;
+    }
+    .cart-total {
+        background-color: var(--accent-color);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+    }
+    .btn-remove {
+        color: #dc3545;
+        background: none;
+        border: none;
+        padding: 5px;
+    }
+    .btn-remove:hover {
+        color: #c82333;
+    }
+    .quantity-control {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .quantity-control input {
+        width: 60px;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block title %}Mon Panier - Bon Appétit{% endblock %}
+
+{% block content %}
+<form id="csrf-form" style="display: none;">
+    {% csrf_token %}
+</form>
+
+<div class="container py-5">
+    <h1 class="text-center mb-4">Mon Panier</h1>
+
+    {% if items %}
+        <div class="row">
+            <div class="col-md-8">
+                {% for item in items %}
+                <div class="cart-item">
+                    <div class="row align-items-center">
+                        <div class="col-md-2">
+                            {% if item.menu.image %}
+                            <img src="{{ item.menu.image.url }}" alt="{{ item.menu.nom }}" class="img-fluid">
+                            {% else %}
+                            <img src="{% static 'images/placeholder-menu.jpg' %}" alt="{{ item.menu.nom }}" class="img-fluid">
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <h5>{{ item.menu.nom }}</h5>
+                            <p class="text-muted">{{ item.menu.categorie.nom }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="quantity-control">
+                                <button type="button" class="btn btn-sm btn-outline-secondary decrease-quantity" data-menu-id="{{ item.menu.id_menu }}">-</button>
+                                <span class="mx-2 quantity-display" data-menu-id="{{ item.menu.id_menu }}">{{ item.quantite }}</span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary increase-quantity" data-menu-id="{{ item.menu.id_menu }}">+</button>
+                            </div>
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <p class="mb-0 sous-total" data-menu-id="{{ item.menu.id_menu }}">{{ item.sous_total }} FCFA</p>
+                        </div>
+                        <div class="col-md-1 text-end">
+                            <button type="button" class="btn-remove remove-item" data-menu-id="{{ item.menu.id_menu }}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="col-md-4">
+                <div class="cart-total">
+                    <h4 class="mb-3">Récapitulatif</h4>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Sous-total</span>
+                        <span id="cart-subtotal">{{ total }} FCFA</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Frais de livraison</span>
+                        <span>Gratuit</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-4">
+                        <strong>Total</strong>
+                        <strong id="cart-total">{{ total }} FCFA</strong>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'commandes:nouvelle_commande' %}" class="btn btn-light">
+                            <i class="fas fa-shopping-basket me-2"></i>Passer la commande
+                        </a>
+                        <button type="button" class="btn btn-outline-light" id="clear-cart">
+                            <i class="fas fa-trash me-2"></i>Vider le panier
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-shopping-cart fa-3x mb-3 text-muted"></i>
+            <h3>Votre panier est vide</h3>
+            <p class="text-muted">Découvrez nos délicieux menus et commencez vos achats !</p>
+            <a href="{% url 'menus:menu' %}" class="btn btn-primary mt-3">
+                <i class="fas fa-utensils me-2"></i>Voir les menus
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/cart_modal.js' %}"></script>
+{% endblock %} 

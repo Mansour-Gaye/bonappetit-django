@@ -1,0 +1,54 @@
+{% csrf_token %}
+<div class="table-responsive">
+    <table class="table align-middle mb-0">
+        <thead class="table-light">
+            <tr>
+                <th>Menu</th>
+                <th class="text-center">Quantité</th>
+                <th class="text-end">Sous-total</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if items %}
+                {% for item in items %}
+                <tr data-menu-id="{{ item.menu.id_menu }}">
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            {% if item.menu.image %}
+                                <img src="{{ item.menu.image.url }}" alt="{{ item.menu.nom }}" style="width:40px;height:40px;object-fit:cover;border-radius:5px;">
+                            {% endif %}
+                            <div>
+                                <span class="fw-bold text-warning">{{ item.menu.nom }}</span><br>
+                                <span class="badge bg-warning text-dark">{{ item.menu.prix }} FCFA</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        <div class="d-inline-flex align-items-center justify-content-center gap-1">
+                            <button type="button" class="btn btn-sm btn-outline-secondary decrease-quantity" data-menu-id="{{ item.menu.id_menu }}">-</button>
+                            <span class="mx-2 quantity-display" data-menu-id="{{ item.menu.id_menu }}">{{ item.quantite }}</span>
+                            <button type="button" class="btn btn-sm btn-outline-secondary increase-quantity" data-menu-id="{{ item.menu.id_menu }}">+</button>
+                        </div>
+                    </td>
+                    <td class="text-end sous-total" data-menu-id="{{ item.menu.id_menu }}">{{ item.sous_total }} FCFA</td>
+                    <td class="text-end">
+                        <button type="button" class="btn btn-outline-danger btn-sm remove-item" data-menu-id="{{ item.menu.id_menu }}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr><td colspan="4" class="text-center py-4">Votre panier est vide.</td></tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+<div class="d-flex justify-content-between align-items-center p-3 border-top">
+    <button type="button" class="btn btn-outline-danger" id="clear-cart">
+        <i class="fas fa-trash"></i> Vider
+    </button>
+    <div class="fw-bold fs-5">Total : <span id="cart-total">{{ total }}</span> FCFA</div>
+    <a href="{% url 'commandes:nouvelle_commande' %}" class="btn btn-warning fw-bold">Passer la commande</a>
+</div> 

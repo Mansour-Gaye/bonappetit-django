@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<style>
+    .order-summary {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .order-item {
+        border-bottom: 1px solid #eee;
+        padding: 10px 0;
+    }
+    .order-item:last-child {
+        border-bottom: none;
+    }
+    .order-total {
+        background-color: var(--accent-color);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+    }
+    .delivery-info {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block title %}Nouvelle Commande - Bon Appétit{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-4">Nouvelle Commande</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="delivery-info">
+                <h4 class="mb-3"><i class="fas fa-info-circle me-2"></i>Informations de livraison</h4>
+                <p class="mb-2"><strong>Nom :</strong> {{ request.user.get_full_name }}</p>
+                <p class="mb-2"><strong>Email :</strong> {{ request.user.email }}</p>
+                <p class="mb-0"><strong>Téléphone :</strong> {{ request.user.telephone|default:"Non renseigné" }}</p>
+            </div>
+
+            <div class="order-summary">
+                <h4 class="mb-3"><i class="fas fa-shopping-basket me-2"></i>Récapitulatif de la commande</h4>
+                {% for item in items %}
+                <div class="order-item">
+                    <div class="row align-items-center">
+                        <div class="col-md-2">
+                            {% if item.menu.image %}
+                            <img src="{{ item.menu.image.url }}" alt="{{ item.menu.nom }}" class="img-fluid rounded">
+                            {% else %}
+                            <img src="{% static 'images/placeholder-menu.jpg' %}" alt="{{ item.menu.nom }}" class="img-fluid rounded">
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="mb-1">{{ item.menu.nom }}</h6>
+                            <p class="text-muted mb-0">{{ item.menu.categorie.nom }}</p>
+                        </div>
+                        <div class="col-md-2 text-center">
+                            <span class="badge bg-light text-dark">x{{ item.quantite }}</span>
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <p class="mb-0">{{ item.sous_total }} FCFA</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="order-total">
+                <h4 class="mb-3">Total de la commande</h4>
+                <div class="d-flex justify-content-between mb-3">
+                    <span>Sous-total</span>
+                    <span>{{ total }} FCFA</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <span>Frais de livraison</span>
+                    <span>Gratuit</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between mb-4">
+                    <strong>Total</strong>
+                    <strong>{{ total }} FCFA</strong>
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-light">
+                            <i class="fas fa-check-circle me-2"></i>Confirmer la commande
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

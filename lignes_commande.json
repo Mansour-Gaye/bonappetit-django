@@ -1,0 +1,38 @@
+[
+{
+  "model": "commandes.lignecommande",
+  "pk": 1,
+  "fields": {
+    "commande": 1,
+    "menu": 11,
+    "quantite": 1
+  }
+},
+{
+  "model": "commandes.lignecommande",
+  "pk": 2,
+  "fields": {
+    "commande": 1,
+    "menu": 12,
+    "quantite": 1
+  }
+},
+{
+  "model": "commandes.lignecommande",
+  "pk": 4,
+  "fields": {
+    "commande": 2,
+    "menu": 15,
+    "quantite": 1
+  }
+},
+{
+  "model": "commandes.lignecommande",
+  "pk": 5,
+  "fields": {
+    "commande": 2,
+    "menu": 5,
+    "quantite": 2
+  }
+}
+]

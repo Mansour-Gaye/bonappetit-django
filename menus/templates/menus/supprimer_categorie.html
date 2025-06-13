@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link href="{% static 'css/menu.css' %}?v=3" rel="stylesheet">
+{% endblock %}
+
+{% block title %}Supprimer la Catégorie - Bon Appétit{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Confirmer la suppression</h3>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Êtes-vous sûr de vouloir supprimer la catégorie suivante ?</p>
+                    
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ categorie.nom }}</h5>
+                            <p class="card-text">{{ categorie.description|default:"Aucune description" }}</p>
+                            <p class="card-text">
+                                <small class="text-muted">Ordre d'affichage: {{ categorie.ordre_affichage }}</small>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    {% if categorie.menu_set.exists %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>Impossible de supprimer cette catégorie !</strong><br>
+                        Elle contient actuellement {{ categorie.menu_set.count }} menu(s).<br>
+                        Vous devez d'abord déplacer ou supprimer tous les menus de cette catégorie.
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>Attention :</strong> Cette action est irréversible !
+                    </div>
+                    
+                    <form method="post" class="d-flex justify-content-between">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-2"></i>Oui, supprimer définitivement
+                        </button>
+                        <a href="{% url 'menus:gestion_categories' %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Non, annuler
+                        </a>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
