@@ -1,0 +1,145 @@
+{% extends 'base_restaurantly.html' %}
+{% load static %}
+
+{% block title %}Connexion - Bon Appétit{% endblock %}
+
+{% block body_class %}login-page{% endblock %}
+
+{% block content %}
+<!-- Page Title -->
+<section class="page-title d-flex align-items-center">
+  <div class="container position-relative text-center text-lg-start" data-aos="zoom-in" data-aos-delay="100">
+    <div class="d-flex">
+      <div>
+        <h1>Connexion</h1>
+        <p>Accédez à votre compte Bon Appétit</p>
+      </div>
+    </div>
+  </div>
+</section><!-- End Page Title -->
+
+<!-- Login Section -->
+<section class="login-section section">
+  <div class="container" data-aos="fade-up" data-aos-delay="100">
+    <div class="row justify-content-center">
+      <div class="col-lg-6 col-md-8">
+        <div class="login-form-container">
+          <div class="card shadow-lg border-0">
+            <div class="card-body p-5">
+              <div class="text-center mb-4">
+                <h3 class="mb-3">Bienvenue chez Bon Appétit</h3>
+                <p class="text-muted">Connectez-vous pour accéder à votre espace personnel</p>
+              </div>
+
+              {% if messages %}
+                {% for message in messages %}
+                  <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+                {% endfor %}
+              {% endif %}
+
+              <form method="post" class="login-form">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                  <label for="{{ form.username.id_for_label }}" class="form-label">Nom d'utilisateur</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                    {{ form.username }}
+                  </div>
+                  {% if form.username.errors %}
+                    <div class="text-danger small mt-1">
+                      {% for error in form.username.errors %}
+                        {{ error }}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="mb-4">
+                  <label for="{{ form.password.id_for_label }}" class="form-label">Mot de passe</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                    {{ form.password }}
+                  </div>
+                  {% if form.password.errors %}
+                    <div class="text-danger small mt-1">
+                      {% for error in form.password.errors %}
+                        {{ error }}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="d-grid">
+                  <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Se connecter
+                  </button>
+                </div>
+              </form>
+
+              <div class="text-center mt-4">
+                <p class="mb-0">Pas encore de compte ? 
+                  <a href="{% url 'comptes:register' %}" class="text-decoration-none">Créer un compte</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section><!-- /Login Section -->
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.login-form-container {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.login-form .form-control {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 12px 15px;
+  font-size: 1rem;
+}
+
+.login-form .form-control:focus {
+  border-color: #cda45e;
+  box-shadow: 0 0 0 0.2rem rgba(205, 164, 94, 0.25);
+}
+
+.login-form .input-group-text {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  color: #6c757d;
+}
+
+.login-form .btn-primary {
+  background: #cda45e;
+  border-color: #cda45e;
+  padding: 12px 30px;
+  font-weight: 600;
+  border-radius: 8px;
+}
+
+.login-form .btn-primary:hover {
+  background: #b8944e;
+  border-color: #b8944e;
+}
+
+.card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.alert {
+  border-radius: 8px;
+  border: none;
+}
+</style>
+{% endblock %} 

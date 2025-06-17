@@ -109,9 +109,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify({ quantite: quantite })
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                // Vérifier si l'utilisateur n'est pas connecté
+                if (response.status === 403 || response.status === 401) {
+                    // Rediriger vers la page de login
+                    window.location.href = '{% url "comptes:login" %}';
+                    return;
+                }
+                
+                // Vérifier si c'est une redirection (status 302)
+                if (response.status === 302) {
+                    // Rediriger vers la page de login
+                    window.location.href = '{% url "comptes:login" %}';
+                    return;
+                }
+                
+                // Vérifier le type de contenu
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('text/html')) {
+                    // C'est probablement une page de redirection HTML
+                    window.location.href = '{% url "comptes:login" %}';
+                    return;
+                }
+                
+                return response.json();
+            })
             .then(data => {
-                if (data.success) {
+                if (data && data.success) {
                     document.dispatchEvent(new Event('cartUpdated'));
                     submitButton.innerHTML = '<i class="fas fa-check me-2"></i>Ajouté !';
                     submitButton.classList.remove('btn-cart');
@@ -122,16 +149,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         submitButton.classList.add('btn-cart');
                         submitButton.disabled = false;
                     }, 2000);
-                } else {
+                } else if (data) {
                     alert(data.message || 'Erreur lors de l\'ajout au panier.');
                     submitButton.disabled = false;
                     submitButton.innerHTML = originalText;
                 }
             })
             .catch(() => {
-                alert('Erreur lors de l\'ajout au panier.');
-                submitButton.disabled = false;
-                submitButton.innerHTML = originalText;
+                // En cas d'erreur, rediriger vers la page de login
+                window.location.href = '{% url "comptes:login" %}';
             });
         });
     }

@@ -14,8 +14,31 @@
         <li>Téléphone: {{ user.phone|default:"Non fourni" }}</li>
     </ul>
 
-    <h2>Historique des Commandes</h2>
-    <p>(L'historique des commandes apparaîtra ici.)</p>
+    <h2>Mes Commandes</h2>
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Commandes Actives</h5>
+                    <p class="card-text">Consultez vos commandes en cours, en préparation ou prêtes à retirer.</p>
+                    <a href="{% url 'commandes:liste_commandes' %}" class="btn btn-primary">
+                        <i class="fas fa-shopping-cart me-2"></i>Voir mes commandes
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Historique des Commandes</h5>
+                    <p class="card-text">Consultez l'historique de vos commandes terminées et annulées.</p>
+                    <a href="{% url 'commandes:historique_commandes' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-history me-2"></i>Voir l'historique
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <h2>Notifications</h2>
     <div id="notifications-section">

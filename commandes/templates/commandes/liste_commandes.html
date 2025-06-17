@@ -4,7 +4,12 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1>Mes Commandes</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Mes Commandes</h1>
+        <a href="{% url 'commandes:historique_commandes' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-history me-2"></i>Historique
+        </a>
+    </div>
 
     {% if messages %}
         {% for message in messages %}

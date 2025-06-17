@@ -1,0 +1,170 @@
+{% extends 'base_restaurantly.html' %}
+{% load static %}
+
+{% block title %}Historique des Commandes - Bon Appétit{% endblock %}
+
+{% block body_class %}historique-page{% endblock %}
+
+{% block content %}
+<!-- Page Title -->
+<section class="page-title d-flex align-items-center">
+  <div class="container position-relative text-center text-lg-start" data-aos="zoom-in" data-aos-delay="100">
+    <div class="d-flex">
+      <div>
+        <h1>Historique des Commandes</h1>
+        <p>Retrouvez toutes vos commandes passées</p>
+      </div>
+    </div>
+  </div>
+</section><!-- End Page Title -->
+
+<!-- Historique Section -->
+<section class="historique-section section">
+  <div class="container" data-aos="fade-up" data-aos-delay="100">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% if commandes %}
+      <div class="row">
+        {% for commande in commandes %}
+          <div class="col-lg-6 col-md-12 mb-4">
+            <div class="historique-card card shadow-lg border-0 h-100">
+              <div class="card-header bg-transparent border-0">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0">Commande #{{ commande.id }}</h5>
+                  <span class="badge {% if commande.etat == 'RETIREE' %}bg-success{% elif commande.etat == 'ANNULEE' %}bg-danger{% else %}bg-secondary{% endif %}">
+                    {{ commande.get_etat_display }}
+                  </span>
+                </div>
+                <small class="text-muted">{{ commande.date_commande|date:"d/m/Y à H:i" }}</small>
+              </div>
+              
+              <div class="card-body">
+                <div class="commande-items">
+                  {% for ligne in commande.lignes.all %}
+                    <div class="item-row d-flex justify-content-between align-items-center mb-2">
+                      <div class="item-info">
+                        <span class="fw-bold">{{ ligne.menu.nom }}</span>
+                        <small class="text-muted d-block">{{ ligne.menu.categorie.nom }}</small>
+                      </div>
+                      <div class="item-quantity">
+                        <span class="badge bg-light text-dark">x{{ ligne.quantite }}</span>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+                
+                <hr>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <span class="fw-bold">Total:</span>
+                    <span class="text-primary fw-bold">{{ commande.montant_total }} €</span>
+                  </div>
+                  <div>
+                    <a href="{% url 'commandes:detail_commande' commande.id %}" class="btn btn-outline-primary btn-sm">
+                      <i class="bi bi-eye me-1"></i>Détails
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="text-center py-5">
+        <div class="empty-state">
+          <i class="bi bi-clock-history" style="font-size: 4rem; color: #cda45e; margin-bottom: 1rem;"></i>
+          <h4>Aucune commande dans l'historique</h4>
+          <p class="text-muted">Vous n'avez pas encore de commandes terminées.</p>
+          <a href="{% url 'menus:menu' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Commander maintenant
+          </a>
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="text-center mt-4">
+      <a href="{% url 'commandes:liste_commandes' %}" class="btn btn-outline-primary">
+        <i class="bi bi-list-ul me-2"></i>Mes commandes en cours
+      </a>
+    </div>
+  </div>
+</section><!-- /Historique Section -->
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.historique-card {
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s ease-in-out;
+  opacity: 0.9;
+}
+
+.historique-card:hover {
+  transform: translateY(-5px);
+  opacity: 1;
+}
+
+.commande-items {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.item-row {
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.item-row:last-child {
+  border-bottom: none;
+}
+
+.item-info {
+  flex: 1;
+}
+
+.item-quantity {
+  margin-left: 10px;
+}
+
+.badge {
+  font-size: 0.875rem;
+  padding: 6px 12px;
+}
+
+.btn {
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 500;
+}
+
+.btn-outline-primary {
+  color: #cda45e;
+  border-color: #cda45e;
+}
+
+.btn-outline-primary:hover {
+  background: #cda45e;
+  border-color: #cda45e;
+  color: #fff;
+}
+
+.empty-state {
+  padding: 3rem 0;
+}
+
+.alert {
+  border-radius: 8px;
+  border: none;
+}
+</style>
+{% endblock %} 

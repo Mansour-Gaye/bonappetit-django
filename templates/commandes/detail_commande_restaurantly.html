@@ -1,0 +1,257 @@
+{% extends 'base_restaurantly.html' %}
+{% load static %}
+
+{% block title %}Détail Commande #{{ commande.id }} - Bon Appétit{% endblock %}
+
+{% block body_class %}detail-commande-page{% endblock %}
+
+{% block content %}
+<!-- Page Title -->
+<section class="page-title d-flex align-items-center">
+  <div class="container position-relative text-center text-lg-start" data-aos="zoom-in" data-aos-delay="100">
+    <div class="d-flex">
+      <div>
+        <h1>Commande #{{ commande.id }}</h1>
+        <p>Détails de votre commande</p>
+      </div>
+    </div>
+  </div>
+</section><!-- End Page Title -->
+
+<!-- Detail Commande Section -->
+<section class="detail-commande-section section">
+  <div class="container" data-aos="fade-up" data-aos-delay="100">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <div class="row">
+      <div class="col-lg-8 mx-auto">
+        <div class="detail-commande-container">
+          <!-- Commande Info Card -->
+          <div class="card shadow-lg border-0 mb-4">
+            <div class="card-header bg-transparent border-0">
+              <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Informations de la commande</h4>
+                <span class="badge {% if commande.etat == 'EN_ATTENTE' %}bg-warning{% elif commande.etat == 'EN_PREPARATION' %}bg-info{% elif commande.etat == 'PRETE' %}bg-success{% elif commande.etat == 'RETIREE' %}bg-success{% elif commande.etat == 'ANNULEE' %}bg-danger{% else %}bg-secondary{% endif %} fs-6">
+                  {{ commande.get_etat_display }}
+                </span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <div class="info-item">
+                    <label class="form-label fw-bold">Numéro de commande</label>
+                    <p class="mb-0">#{{ commande.id }}</p>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <div class="info-item">
+                    <label class="form-label fw-bold">Date de commande</label>
+                    <p class="mb-0">{{ commande.date_commande|date:"d/m/Y à H:i" }}</p>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <div class="info-item">
+                    <label class="form-label fw-bold">Client</label>
+                    <p class="mb-0">{{ commande.client.get_full_name|default:commande.client.username }}</p>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <div class="info-item">
+                    <label class="form-label fw-bold">Montant total</label>
+                    <p class="mb-0 text-primary fw-bold fs-5">{{ commande.montant_total }} €</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Items Card -->
+          <div class="card shadow-lg border-0 mb-4">
+            <div class="card-header bg-transparent border-0">
+              <h4 class="mb-0">Articles commandés</h4>
+            </div>
+            <div class="card-body">
+              {% if items %}
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Article</th>
+                        <th class="text-center">Quantité</th>
+                        <th class="text-center">Prix unitaire</th>
+                        <th class="text-end">Sous-total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for item in items %}
+                        <tr>
+                          <td>
+                            <div class="d-flex align-items-center">
+                              {% if item.menu.image %}
+                                <img src="{{ item.menu.image.url }}" alt="{{ item.menu.nom }}" class="me-3" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+                              {% else %}
+                                <div class="me-3" style="width: 50px; height: 50px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                  <i class="bi bi-image text-muted"></i>
+                                </div>
+                              {% endif %}
+                              <div>
+                                <div class="fw-bold">{{ item.menu.nom }}</div>
+                                <small class="text-muted">{{ item.menu.categorie.nom }}</small>
+                              </div>
+                            </div>
+                          </td>
+                          <td class="text-center">
+                            <span class="badge bg-primary">{{ item.quantite }}</span>
+                          </td>
+                          <td class="text-center">{{ item.prix_unitaire }} €</td>
+                          <td class="text-end fw-bold">{{ item.sous_total }} €</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                    <tfoot class="table-light">
+                      <tr>
+                        <td colspan="3" class="text-end fw-bold">Total</td>
+                        <td class="text-end fw-bold fs-5 text-primary">{{ total }} €</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              {% else %}
+                <div class="text-center py-4">
+                  <p class="text-muted">Aucun article trouvé pour cette commande.</p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Actions Card -->
+          <div class="card shadow-lg border-0">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <a href="{% url 'commandes:liste_commandes' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Retour aux commandes
+                  </a>
+                </div>
+                <div class="btn-group">
+                  {% if commande.etat == 'EN_ATTENTE' %}
+                    <form method="post" action="{% url 'commandes:annuler_commande' commande.id %}" class="d-inline" 
+                          onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?')">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-outline-danger">
+                        <i class="bi bi-x-circle me-2"></i>Annuler la commande
+                      </button>
+                    </form>
+                  {% endif %}
+                  {% if commande.etat == 'PRETE' %}
+                    <button class="btn btn-success" disabled>
+                      <i class="bi bi-check-circle me-2"></i>Prêt pour retrait
+                    </button>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section><!-- /Detail Commande Section -->
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.detail-commande-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.info-item {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 4px solid #cda45e;
+}
+
+.info-item label {
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.info-item p {
+  color: #666;
+  margin: 0;
+}
+
+.card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table th {
+  border-top: none;
+  font-weight: 600;
+  color: #333;
+}
+
+.table td {
+  vertical-align: middle;
+  border-color: #f0f0f0;
+}
+
+.badge {
+  font-size: 0.875rem;
+  padding: 6px 12px;
+}
+
+.btn {
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 500;
+}
+
+.btn-outline-secondary {
+  color: #6c757d;
+  border-color: #6c757d;
+}
+
+.btn-outline-secondary:hover {
+  background: #6c757d;
+  border-color: #6c757d;
+  color: #fff;
+}
+
+.btn-outline-danger {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-outline-danger:hover {
+  background: #dc3545;
+  border-color: #dc3545;
+  color: #fff;
+}
+
+.btn-success {
+  background: #28a745;
+  border-color: #28a745;
+}
+
+.alert {
+  border-radius: 8px;
+  border: none;
+}
+</style>
+{% endblock %} 

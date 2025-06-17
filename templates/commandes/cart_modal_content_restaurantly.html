@@ -1,0 +1,177 @@
+{% load static %}
+
+{% if items %}
+<div class="cart-items">
+  {% for item in items %}
+  <div class="cart-item d-flex align-items-center mb-3 p-3 border rounded">
+    <div class="cart-item-img me-3">
+      <img src="{% if item.menu.image %}{{ item.menu.image.url }}{% else %}{% static 'assets/img/menu/cake.jpg' %}{% endif %}" alt="{{ item.menu.nom }}" class="img-fluid" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
+    </div>
+    <div class="cart-item-details flex-grow-1">
+      <h6 class="mb-1">{{ item.menu.nom }}</h6>
+      <p class="text-muted mb-1">{{ item.menu.categorie.nom }}</p>
+      <div class="d-flex align-items-center justify-content-between">
+        <div class="quantity-controls d-flex align-items-center">
+          <button class="btn btn-sm btn-outline-secondary decrease-quantity" data-menu-id="{{ item.menu.id_menu }}" style="width: 30px; height: 30px; padding: 0;">
+            <i class="bi bi-dash"></i>
+          </button>
+          <span class="mx-2 quantity-display">{{ item.quantite }}</span>
+          <button class="btn btn-sm btn-outline-secondary increase-quantity" data-menu-id="{{ item.menu.id_menu }}" style="width: 30px; height: 30px; padding: 0;">
+            <i class="bi bi-plus"></i>
+          </button>
+        </div>
+        <div class="cart-item-price">
+          <span class="fw-bold">{{ item.sous_total }}€</span>
+          <button class="btn btn-sm btn-outline-danger ms-2 remove-item" data-menu-id="{{ item.menu.id_menu }}" title="Supprimer">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  
+  <div class="cart-summary mt-4 p-3 bg-light rounded">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h6 class="mb-0">Total:</h6>
+      <h5 class="mb-0 text-primary">{{ total }}€</h5>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-danger btn-sm flex-fill" id="emptyCart">
+        <i class="bi bi-trash"></i> Vider le panier
+      </button>
+      <a href="{% url 'commandes:nouvelle_commande' %}" class="btn btn-primary btn-sm flex-fill">
+        <i class="bi bi-cart-check"></i> Commander
+      </a>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="text-center py-5">
+  <i class="bi bi-cart3 fs-1 text-muted mb-3"></i>
+  <h5>Votre panier est vide</h5>
+  <p class="text-muted">Découvrez nos délicieux menus et commencez votre commande !</p>
+  <a href="{% url 'menus:menu' %}" class="btn btn-primary">
+    <i class="bi bi-arrow-right"></i> Voir nos menus
+  </a>
+</div>
+{% endif %}
+
+<script>
+$(document).ready(function() {
+  // Augmenter la quantité
+  $('.increase-quantity').click(function() {
+    var menuId = $(this).data('menu-id');
+    var button = $(this);
+    var quantityDisplay = button.siblings('.quantity-display');
+    var currentQuantity = parseInt(quantityDisplay.text());
+    
+    $.ajax({
+      url: '/commandes/ajouter_au_panier/' + menuId + '/',
+      method: 'POST',
+      data: JSON.stringify({
+        quantite: 1
+      }),
+      contentType: 'application/json',
+      success: function(response) {
+        if (response.success) {
+          quantityDisplay.text(currentQuantity + 1);
+          updateCartTotal(response.total);
+          document.dispatchEvent(new Event('cartUpdated'));
+        }
+      },
+      error: function(xhr) {
+        if (xhr.status === 401 || xhr.status === 403 || xhr.status === 302) {
+          window.location.href = '{% url "comptes:login" %}';
+        }
+      }
+    });
+  });
+  
+  // Diminuer la quantité
+  $('.decrease-quantity').click(function() {
+    var menuId = $(this).data('menu-id');
+    var button = $(this);
+    var quantityDisplay = button.siblings('.quantity-display');
+    var currentQuantity = parseInt(quantityDisplay.text());
+    
+    if (currentQuantity > 1) {
+      $.ajax({
+        url: '/commandes/ajouter_au_panier/' + menuId + '/',
+        method: 'POST',
+        data: JSON.stringify({
+          quantite: -1
+        }),
+        contentType: 'application/json',
+        success: function(response) {
+          if (response.success) {
+            quantityDisplay.text(currentQuantity - 1);
+            updateCartTotal(response.total);
+            document.dispatchEvent(new Event('cartUpdated'));
+          }
+        },
+        error: function(xhr) {
+          if (xhr.status === 401 || xhr.status === 403 || xhr.status === 302) {
+            window.location.href = '{% url "comptes:login" %}';
+          }
+        }
+      });
+    }
+  });
+  
+  // Supprimer un article
+  $('.remove-item').click(function() {
+    var menuId = $(this).data('menu-id');
+    var cartItem = $(this).closest('.cart-item');
+    
+    $.ajax({
+      url: '/commandes/supprimer_du_panier/' + menuId + '/',
+      method: 'POST',
+      success: function(response) {
+        if (response.success) {
+          cartItem.fadeOut(300, function() {
+            $(this).remove();
+            updateCartTotal(response.total);
+            document.dispatchEvent(new Event('cartUpdated'));
+            
+            // Si plus d'articles, recharger le contenu
+            if ($('.cart-item').length === 0) {
+              location.reload();
+            }
+          });
+        }
+      },
+      error: function(xhr) {
+        if (xhr.status === 401 || xhr.status === 403 || xhr.status === 302) {
+          window.location.href = '{% url "comptes:login" %}';
+        }
+      }
+    });
+  });
+  
+  // Vider le panier
+  $('#emptyCart').click(function() {
+    if (confirm('Êtes-vous sûr de vouloir vider votre panier ?')) {
+      $.ajax({
+        url: '{% url "commandes:vider_panier" %}',
+        method: 'POST',
+        success: function(response) {
+          if (response.success) {
+            location.reload();
+            document.dispatchEvent(new Event('cartUpdated'));
+          }
+        },
+        error: function(xhr) {
+          if (xhr.status === 401 || xhr.status === 403 || xhr.status === 302) {
+            window.location.href = '{% url "comptes:login" %}';
+          }
+        }
+      });
+    }
+  });
+  
+  function updateCartTotal(total) {
+    $('.cart-summary h5').text(total + '€');
+  }
+});
+</script> 

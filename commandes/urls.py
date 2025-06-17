@@ -14,6 +14,7 @@ urlpatterns = [
     path('gestionnaire/update_status/<int:commande_id>/', views.update_commande_status_view, name='update_commande_status'),
 
     path('', views.liste_commandes, name='liste_commandes'),
+    path('historique/', views.historique_commandes, name='historique_commandes'),
     path('nouvelle/', views.nouvelle_commande, name='nouvelle_commande'),
     path('detail/<int:commande_id>/', views.detail_commande, name='detail_commande'),
     path('annuler/<int:commande_id>/', views.annuler_commande, name='annuler_commande'),

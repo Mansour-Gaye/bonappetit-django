@@ -1,0 +1,277 @@
+# RÈGLES UX/UI - BON APPÉTIT RESTAURANT
+# Guide de design et d'expérience utilisateur
+
+## 🎨 PRINCIPES FONDAMENTAUX
+
+### 1. HIÉRARCHIE VISUELLE
+- **Titres H1** : 3rem (48px) - Page principale uniquement
+- **Titres H2** : 2.5rem (40px) - Sections principales
+- **Titres H3** : 2rem (32px) - Sous-sections
+- **Titres H4** : 1.3rem (21px) - Éléments de contenu
+- **Corps de texte** : 1rem (16px) - Lisibilité optimale
+- **Texte secondaire** : 0.9rem (14px) - Descriptions, métadonnées
+
+### 2. ESPACEMENT ET BLANC
+- **Espacement de section** : 80px (5rem) entre les sections principales
+- **Espacement de contenu** : 40px (2.5rem) entre les éléments
+- **Espacement de groupe** : 20px (1.25rem) entre éléments liés
+- **Espacement de ligne** : 1.6 pour le corps de texte
+- **Marges latérales** : Minimum 20px sur mobile, 40px sur desktop
+- **Padding interne** : 15-20px pour les cartes et conteneurs
+
+### 3. CONTRASTE ET ACCESSIBILITÉ
+- **Contraste minimum** : 4.5:1 pour le texte normal
+- **Contraste élevé** : 7:1 pour le texte petit (< 18px)
+- **Couleurs d'accent** : #cda45e (doré) pour les éléments interactifs
+- **Couleurs de fond** : Blanc pur (#ffffff) pour le contenu principal
+- **Couleurs de texte** : #333333 pour le texte principal, #666666 pour le secondaire
+- **États de focus** : Toujours visibles pour l'accessibilité clavier
+
+## 🎯 TENDANCES MODERNES À UTILISER
+
+### 1. EFFETS PARALLAXE
+- **Hero section** : Parallaxe léger sur l'image de fond
+- **Sections de contenu** : Défilement fluide avec AOS
+- **Cartes de menu** : Effet de survol avec translation Y
+- **Navigation** : Header avec effet de transparence au scroll
+
+### 2. ANIMATIONS ET TRANSITIONS
+- **Durée standard** : 300ms pour les interactions
+- **Durée longue** : 500ms pour les animations de page
+- **Easing** : ease-in-out pour les transitions naturelles
+- **Animations AOS** : fade-up, zoom-in, slide-up
+- **Micro-interactions** : Boutons avec feedback visuel immédiat
+
+### 3. DESIGN GLASSMORPHISM
+- **Modals** : Fond flou avec transparence
+- **Cartes flottantes** : Ombre douce avec bordure subtile
+- **Navigation** : Effet de verre au scroll
+- **Formulaires** : Champs avec fond semi-transparent
+
+### 4. DESIGN NEUMORPHISM (Éléments sélectifs)
+- **Boutons d'action** : Ombre intérieure/extérieure subtile
+- **Contrôles de quantité** : Effet 3D léger
+- **Cartes de menu** : Relief doux au survol
+
+## 🍽️ SPÉCIFICITÉS RESTAURANT
+
+### 1. HIÉRARCHIE DES MENUS
+- **Image du menu** : 200px de hauteur, object-fit: cover
+- **Nom du menu** : Police Playfair Display, gras
+- **Prix** : Couleur dorée #cda45e, aligné à droite
+- **Description** : Italique, couleur #666666
+- **Catégorie** : Badge coloré, coin supérieur droit
+
+### 2. EXPÉRIENCE DU PANIER
+- **Modal** : Largeur 600px minimum, hauteur adaptative
+- **Articles** : Image 60x60px, informations claires
+- **Contrôles** : Boutons circulaires 30x30px
+- **Total** : Mise en évidence, police plus grande
+- **Actions** : Boutons pleine largeur, contrastés
+
+### 3. NAVIGATION RESTAURANT
+- **Logo** : Typographie élégante, taille adaptative
+- **Menu principal** : 5-7 éléments maximum
+- **Panier** : Icône avec compteur, toujours visible
+- **Profil** : Dropdown avec options claires
+- **Mobile** : Menu hamburger, navigation simplifiée
+
+## 📱 RESPONSIVE DESIGN
+
+### 1. POINTS DE RUPTURE
+- **Mobile** : < 768px
+- **Tablet** : 768px - 1024px
+- **Desktop** : > 1024px
+- **Large** : > 1200px
+
+### 2. ADAPTATIONS MOBILES
+- **Navigation** : Menu hamburger, panier accessible
+- **Menus** : 1 colonne, images plus petites
+- **Texte** : Taille réduite de 10-15%
+- **Espacement** : Réduit de 20-30%
+- **Boutons** : Taille minimum 44px pour le touch
+
+### 3. ADAPTATIONS TABLET
+- **Grille** : 2 colonnes pour les menus
+- **Navigation** : Texte complet, icônes secondaires
+- **Modals** : Largeur 80% de l'écran
+- **Images** : Hauteur adaptative
+
+## 🎨 PALETTE DE COULEURS
+
+### 1. COULEURS PRINCIPALES
+- **Doré principal** : #cda45e
+- **Doré foncé** : #b8944e
+- **Noir élégant** : #1a1814
+- **Blanc pur** : #ffffff
+
+### 2. COULEURS DE TEXTE
+- **Texte principal** : #333333
+- **Texte secondaire** : #666666
+- **Texte léger** : #999999
+- **Liens** : #cda45e
+
+### 3. COULEURS D'ÉTAT
+- **Succès** : #28a745
+- **Erreur** : #dc3545
+- **Avertissement** : #ffc107
+- **Info** : #17a2b8
+
+### 4. COULEURS DE FOND
+- **Fond principal** : #ffffff
+- **Fond secondaire** : #f8f9fa
+- **Fond sombre** : #1a1814
+- **Fond modal** : rgba(0,0,0,0.5)
+
+## 🔤 TYPOGRAPHIE
+
+### 1. POLICES
+- **Titres** : Playfair Display (élégant, gastronomique)
+- **Corps** : Roboto (lisible, moderne)
+- **Accents** : Poppins (contemporain)
+
+### 2. HIÉRARCHIE
+- **H1** : Playfair Display, 3rem, 700
+- **H2** : Playfair Display, 2.5rem, 600
+- **H3** : Playfair Display, 2rem, 600
+- **H4** : Poppins, 1.3rem, 500
+- **Corps** : Roboto, 1rem, 400
+- **Petit** : Roboto, 0.9rem, 400
+
+### 3. ESPACEMENT
+- **Line-height** : 1.6 pour le corps, 1.4 pour les titres
+- **Letter-spacing** : 0.5px pour les titres
+- **Word-spacing** : Normal
+
+## 🎭 COMPOSANTS RÉUTILISABLES
+
+### 1. BOUTONS
+- **Primaire** : Fond #cda45e, texte blanc, padding 12px 30px
+- **Secondaire** : Bordure #cda45e, texte #cda45e, fond transparent
+- **Danger** : Fond #dc3545, texte blanc
+- **Succès** : Fond #28a745, texte blanc
+- **Taille** : Hauteur minimum 44px pour l'accessibilité
+
+### 2. CARTES
+- **Ombre** : 0 2px 15px rgba(0,0,0,0.1)
+- **Border-radius** : 8px pour les cartes, 12px pour les modals
+- **Padding** : 20px interne
+- **Hover** : Translation Y(-5px), ombre augmentée
+
+### 3. FORMULAIRES
+- **Champs** : Bordure 1px #dee2e6, border-radius 4px
+- **Focus** : Bordure #cda45e, ombre subtile
+- **Labels** : Au-dessus des champs, couleur #333333
+- **Erreurs** : Bordure rouge, message explicite
+
+### 4. MODALS
+- **Fond** : rgba(0,0,0,0.5)
+- **Contenu** : Fond blanc, border-radius 12px
+- **Header** : Bordure inférieure, padding 20px
+- **Footer** : Boutons alignés à droite, espacement 10px
+
+## ⚡ PERFORMANCE ET UX
+
+### 1. TEMPS DE CHARGEMENT
+- **Page d'accueil** : < 3 secondes
+- **Pages de menu** : < 2 secondes
+- **Modals** : < 500ms
+- **Images** : Lazy loading, formats WebP
+
+### 2. FEEDBACK UTILISATEUR
+- **Chargement** : Spinners pour les actions > 500ms
+- **Succès** : Messages verts, icônes de validation
+- **Erreurs** : Messages rouges, suggestions de correction
+- **États** : Boutons désactivés pendant les requêtes
+
+### 3. ACCESSIBILITÉ
+- **Contraste** : Minimum 4.5:1
+- **Focus** : Toujours visible
+- **Clavier** : Navigation complète
+- **Écrans lecteurs** : Alt text, ARIA labels
+- **Taille de texte** : Zoom 200% sans perte de fonctionnalité
+
+## 🎪 ANIMATIONS ET MICRO-INTERACTIONS
+
+### 1. ANIMATIONS D'ENTRÉE
+- **Fade-up** : Pour les sections de contenu
+- **Zoom-in** : Pour les images et icônes
+- **Slide-up** : Pour les cartes et éléments
+- **Stagger** : Pour les listes d'éléments
+
+### 2. INTERACTIONS
+- **Hover** : Translation Y(-2px), ombre augmentée
+- **Click** : Scale(0.98) pour les boutons
+- **Focus** : Bordure colorée, ombre
+- **Loading** : Rotation pour les spinners
+
+### 3. TRANSITIONS
+- **Durée courte** : 200ms pour les hover
+- **Durée moyenne** : 300ms pour les changements d'état
+- **Durée longue** : 500ms pour les animations de page
+- **Easing** : cubic-bezier(0.4, 0, 0.2, 1)
+
+## 🔧 RÈGLES TECHNIQUES
+
+### 1. CSS
+- **Préfixes** : Utiliser autoprefixer
+- **Variables** : CSS custom properties pour les couleurs
+- **Flexbox/Grid** : Pour les layouts modernes
+- **Media queries** : Mobile-first approach
+
+### 2. JAVASCRIPT
+- **Debounce** : Pour les recherches et filtres
+- **Throttle** : Pour les événements de scroll
+- **Error handling** : Try-catch pour les requêtes AJAX
+- **Loading states** : Gestion des états de chargement
+
+### 3. IMAGES
+- **Formats** : WebP avec fallback JPEG
+- **Tailles** : Responsive images avec srcset
+- **Optimisation** : Compression sans perte de qualité
+- **Lazy loading** : Pour les images hors écran
+
+## 📋 CHECKLIST DE VALIDATION
+
+### AVANT CHAQUE MODIFICATION
+- [ ] Respect de la hiérarchie typographique
+- [ ] Espacement cohérent avec les règles
+- [ ] Contraste suffisant pour l'accessibilité
+- [ ] Responsive sur tous les breakpoints
+- [ ] Animations fluides et appropriées
+- [ ] Performance optimisée
+- [ ] Accessibilité clavier et lecteur d'écran
+- [ ] Cohérence avec la palette de couleurs
+- [ ] Feedback utilisateur approprié
+- [ ] Tests sur différents navigateurs
+
+### APRÈS CHAQUE MODIFICATION
+- [ ] Test sur mobile, tablette, desktop
+- [ ] Vérification des temps de chargement
+- [ ] Test d'accessibilité basique
+- [ ] Validation des interactions utilisateur
+- [ ] Cohérence visuelle globale
+
+## 🎯 OBJECTIFS UX
+
+### 1. EXPÉRIENCE UTILISATEUR
+- **Simplicité** : Interface claire et intuitive
+- **Efficacité** : Actions rapides et directes
+- **Plaisir** : Design attrayant et moderne
+- **Confiance** : Feedback constant et rassurant
+
+### 2. OBJECTIFS BUSINESS
+- **Conversion** : Faciliter les commandes
+- **Engagement** : Encourager l'exploration des menus
+- **Fidélisation** : Expérience mémorable
+- **Accessibilité** : Inclure tous les utilisateurs
+
+### 3. MÉTRIQUES DE SUCCÈS
+- **Temps de chargement** : < 3 secondes
+- **Taux de rebond** : < 40%
+- **Temps sur site** : > 2 minutes
+- **Taux de conversion** : > 5%
+- **Satisfaction utilisateur** : > 4.5/5
+
+---
+*Ce document doit être consulté avant toute modification du design ou de l'interface utilisateur pour maintenir la cohérence et l'excellence de l'expérience Bon Appétit.* 

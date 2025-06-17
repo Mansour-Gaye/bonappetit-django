@@ -7,6 +7,7 @@ class Commande(models.Model):
         ('EN_ATTENTE', 'En attente'),
         ('EN_PREPARATION', 'En préparation'),
         ('PRETE', 'Prête à retirer'),
+        ('RETIREE', 'Retirée'),
         ('ANNULEE', 'Annulée'),
     ]
 

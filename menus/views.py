@@ -11,33 +11,34 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# Create your views here.
-@client_required
-@login_required
-def menu(request):
-    categories = Categorie.objects.all().order_by('ordre_affichage')
-    categorie_id = request.GET.get('categorie')
-    categorie_active = None
-    
-    if categorie_id:
-        menus = Menu.objects.filter(categorie__id_categorie=categorie_id).select_related('categorie').order_by('nom')
-        categorie_active = get_object_or_404(Categorie, id_categorie=categorie_id)
-    else:
-        menus = Menu.objects.all().select_related('categorie').order_by('categorie__ordre_affichage', 'nom')
-    
-    context = {
-        'menus': menus,
-        'categories': categories,
-        'categorie_active': categorie_active
-    }
-    return render(request, 'menus/menu.html', context)
-
 def detail_menu(request, id_menu):
     menu = get_object_or_404(Menu, id_menu=id_menu)
+    
+    # Récupérer les menus précédent et suivant
+    all_menus = Menu.objects.filter(disponible=True).order_by('id_menu')
+    menu_index = list(all_menus).index(menu)
+    
+    previous_menu = None
+    next_menu = None
+    
+    if menu_index > 0:
+        previous_menu = all_menus[menu_index - 1]
+    if menu_index < len(all_menus) - 1:
+        next_menu = all_menus[menu_index + 1]
+    
+    # Récupérer les menus liés (même catégorie, excluant le menu actuel)
+    related_menus = Menu.objects.filter(
+        categorie=menu.categorie,
+        disponible=True
+    ).exclude(id_menu=menu.id_menu).order_by('?')[:4]
+    
     context = {
-        'menu': menu
+        'menu': menu,
+        'previous_menu': previous_menu,
+        'next_menu': next_menu,
+        'related_menus': related_menus
     }
-    return render(request, 'menus/detail_menu.html', context)
+    return render(request, 'menus/detail_menu_restaurantly.html', context)
 
 @login_required(login_url='comptes:login')
 def ajouter_au_panier(request, id_menu):
@@ -79,11 +80,11 @@ def liste_menus(request):
     page_obj = paginator.get_page(page_number)
     
     context = {
-        'page_obj': page_obj,
+        'menus': page_obj,
         'categories': categories,
         'categorie_active': categorie_active,
     }
-    return render(request, 'menus/menu.html', context)
+    return render(request, 'menus/liste_menus_restaurantly.html', context)
 
 # Vues gestionnaire
 @login_required

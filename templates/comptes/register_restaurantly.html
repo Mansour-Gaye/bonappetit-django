@@ -1,0 +1,221 @@
+{% extends 'base_restaurantly.html' %}
+{% load static %}
+
+{% block title %}Inscription - Bon Appétit{% endblock %}
+
+{% block body_class %}register-page{% endblock %}
+
+{% block content %}
+<!-- Page Title -->
+<section class="page-title d-flex align-items-center">
+  <div class="container position-relative text-center text-lg-start" data-aos="zoom-in" data-aos-delay="100">
+    <div class="d-flex">
+      <div>
+        <h1>Inscription</h1>
+        <p>Rejoignez la communauté Bon Appétit</p>
+      </div>
+    </div>
+  </div>
+</section><!-- End Page Title -->
+
+<!-- Register Section -->
+<section class="register-section section">
+  <div class="container" data-aos="fade-up" data-aos-delay="100">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-md-10">
+        <div class="register-form-container">
+          <div class="card shadow-lg border-0">
+            <div class="card-body p-5">
+              <div class="text-center mb-4">
+                <h3 class="mb-3">Créer votre compte</h3>
+                <p class="text-muted">Rejoignez-nous pour profiter de nos délicieuses créations</p>
+              </div>
+
+              {% if messages %}
+                {% for message in messages %}
+                  <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+                {% endfor %}
+              {% endif %}
+
+              <form method="post" class="register-form">
+                {% csrf_token %}
+                
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="{{ form.username.id_for_label }}" class="form-label">Nom d'utilisateur *</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-person"></i></span>
+                      {{ form.username }}
+                    </div>
+                    {% if form.username.errors %}
+                      <div class="text-danger small mt-1">
+                        {% for error in form.username.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    <label for="{{ form.email.id_for_label }}" class="form-label">Email *</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                      {{ form.email }}
+                    </div>
+                    {% if form.email.errors %}
+                      <div class="text-danger small mt-1">
+                        {% for error in form.email.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="{{ form.first_name.id_for_label }}" class="form-label">Prénom</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                      {{ form.first_name }}
+                    </div>
+                    {% if form.first_name.errors %}
+                      <div class="text-danger small mt-1">
+                        {% for error in form.first_name.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    <label for="{{ form.last_name.id_for_label }}" class="form-label">Nom</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                      {{ form.last_name }}
+                    </div>
+                    {% if form.last_name.errors %}
+                      <div class="text-danger small mt-1">
+                        {% for error in form.last_name.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="{{ form.password1.id_for_label }}" class="form-label">Mot de passe *</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                      {{ form.password1 }}
+                    </div>
+                    {% if form.password1.errors %}
+                      <div class="text-danger small mt-1">
+                        {% for error in form.password1.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                    {% if form.password1.help_text %}
+                      <div class="form-text small mt-1">
+                        {{ form.password1.help_text|safe }}
+                      </div>
+                    {% endif %}
+                  </div>
+
+                  <div class="col-md-6 mb-4">
+                    <label for="{{ form.password2.id_for_label }}" class="form-label">Confirmer le mot de passe *</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                      {{ form.password2 }}
+                    </div>
+                    {% if form.password2.errors %}
+                      <div class="text-danger small mt-1">
+                        {% for error in form.password2.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="d-grid">
+                  <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-person-plus me-2"></i>Créer mon compte
+                  </button>
+                </div>
+              </form>
+
+              <div class="text-center mt-4">
+                <p class="mb-0">Déjà un compte ? 
+                  <a href="{% url 'comptes:login' %}" class="text-decoration-none">Se connecter</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section><!-- /Register Section -->
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.register-form-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.register-form .form-control {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 12px 15px;
+  font-size: 1rem;
+}
+
+.register-form .form-control:focus {
+  border-color: #cda45e;
+  box-shadow: 0 0 0 0.2rem rgba(205, 164, 94, 0.25);
+}
+
+.register-form .input-group-text {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  color: #6c757d;
+}
+
+.register-form .btn-primary {
+  background: #cda45e;
+  border-color: #cda45e;
+  padding: 12px 30px;
+  font-weight: 600;
+  border-radius: 8px;
+}
+
+.register-form .btn-primary:hover {
+  background: #b8944e;
+  border-color: #b8944e;
+}
+
+.card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.alert {
+  border-radius: 8px;
+  border: none;
+}
+
+.form-text {
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+</style>
+{% endblock %} 

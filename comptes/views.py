@@ -10,7 +10,7 @@ from .forms import CustomUserCreationForm
 from django.contrib import messages
 from .models import Notification, CustomUser
 from commandes.models import Commande, LigneCommande
-from menus.models import Menu
+from menus.models import Menu, Categorie
 from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 
@@ -28,11 +28,15 @@ def home(request):
         else:
             return redirect('comptes:mon_compte')
     else:
-        return redirect('comptes:login')
+        # Afficher une page d'accueil publique avec le design Restaurantly
+        menus_preview = Menu.objects.filter(disponible=True).select_related('categorie').order_by('?')[:6]
+        return render(request, 'home_restaurantly.html', {
+            'menus_preview': menus_preview
+        })
 
 @login_required
 def profile(request):
-    return render(request, 'comptes/profile.html')
+    return render(request, 'comptes/profile_restaurantly.html')
 
 def register(request):
     if request.method == 'POST':
@@ -49,7 +53,7 @@ def register(request):
             messages.error(request, "Erreur d'inscription. Veuillez corriger les erreurs ci-dessous.")
     else:
         form = CustomUserCreationForm()
-    return render(request, 'comptes/register.html', {'form': form})
+    return render(request, 'comptes/register_restaurantly.html', {'form': form})
 
 @ensure_csrf_cookie
 def user_login(request):
@@ -87,7 +91,7 @@ def user_login(request):
             messages.error(request, "Nom d'utilisateur ou mot de passe incorrect. Veuillez vérifier les champs.")
     else:
         form = AuthenticationForm()
-    return render(request, 'comptes/login.html', {'form': form})
+    return render(request, 'comptes/login_restaurantly.html', {'form': form})
 
 def user_logout(request):
     logout(request)
@@ -113,7 +117,7 @@ def mon_compte_view(request):
         'notifications': notifications,
         'commandes': commandes
     }
-    return render(request, 'comptes/mon_compte.html', context)
+    return render(request, 'comptes/mon_compte_restaurantly.html', context)
 
 @login_required
 @user_passes_test(is_gestionnaire_check, login_url='comptes:login')
@@ -141,6 +145,54 @@ def gestionnaire_dashboard(request):
         'nouveaux': User.objects.filter(date_joined__gte=date_limite).count()
     }
     
+    # Statistiques des menus
+    menus_stats = {
+        'total': Menu.objects.count(),
+        'disponibles': Menu.objects.filter(disponible=True).count(),
+        'categories': Categorie.objects.count(),
+        'prix_moyen': Menu.objects.aggregate(avg_prix=Avg('prix'))['avg_prix'] or 0
+    }
+    
+    # Menus les plus populaires (par quantité commandée)
+    menus_populaires = LigneCommande.objects.values(
+        'menu__nom', 'menu__prix', 'menu__categorie__nom'
+    ).annotate(
+        total_quantite=Sum('quantite'),
+        total_revenus=Sum(F('menu__prix') * F('quantite'))
+    ).order_by('-total_quantite')[:5]
+    
+    # Statistiques par catégorie
+    stats_categories = LigneCommande.objects.values(
+        'menu__categorie__nom'
+    ).annotate(
+        total_menus=Count('menu', distinct=True),
+        total_commandes=Sum('quantite'),
+        revenus_categorie=Sum(F('menu__prix') * F('quantite'))
+    ).order_by('-revenus_categorie')
+    
+    # Menus avec les meilleurs revenus
+    menus_revenus = LigneCommande.objects.values(
+        'menu__nom', 'menu__prix', 'menu__categorie__nom'
+    ).annotate(
+        total_quantite=Sum('quantite'),
+        total_revenus=Sum(F('menu__prix') * F('quantite'))
+    ).order_by('-total_revenus')[:5]
+    
+    # Menus récemment ajoutés
+    menus_recents = Menu.objects.select_related('categorie').order_by('-date_creation')[:5]
+    
+    # Statistiques des 30 derniers jours
+    stats_30_jours = {
+        'commandes': Commande.objects.filter(date_commande__gte=date_limite).count(),
+        'nouveaux_menus': Menu.objects.filter(date_creation__gte=date_limite).count(),
+        'chiffre_affaires': LigneCommande.objects.filter(
+            commande__date_commande__gte=date_limite,
+            commande__etat='TERMINEE'
+        ).aggregate(
+            total=Sum(F('menu__prix') * F('quantite'))
+        )['total'] or 0
+    }
+    
     # Commandes récentes
     commandes_recentes = Commande.objects.select_related('client').prefetch_related(
         'lignes__menu'
@@ -159,6 +211,12 @@ def gestionnaire_dashboard(request):
     context = {
         'commandes_stats': commandes_stats,
         'users_stats': users_stats,
+        'menus_stats': menus_stats,
+        'menus_populaires': menus_populaires,
+        'stats_categories': stats_categories,
+        'menus_revenus': menus_revenus,
+        'menus_recents': menus_recents,
+        'stats_30_jours': stats_30_jours,
         'commandes_recentes': commandes_recentes,
         'notifications': notifications
     }

@@ -148,6 +148,223 @@
         </div>
     </div>
 
+    <!-- Statistiques des Menus -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-3">Statistiques des Menus</h2>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-primary text-white">
+                <div class="stat-icon"><i class="fas fa-utensils"></i></div>
+                <div class="stat-value">{{ menus_stats.total }}</div>
+                <div class="stat-label">Total Menus</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-success text-white">
+                <div class="stat-icon"><i class="fas fa-check"></i></div>
+                <div class="stat-value">{{ menus_stats.disponibles }}</div>
+                <div class="stat-label">Menus Disponibles</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-info text-white">
+                <div class="stat-icon"><i class="fas fa-tags"></i></div>
+                <div class="stat-value">{{ menus_stats.categories }}</div>
+                <div class="stat-label">Catégories</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-warning text-white">
+                <div class="stat-icon"><i class="fas fa-money-bill"></i></div>
+                <div class="stat-value">{{ menus_stats.prix_moyen|floatformat:0 }} FCFA</div>
+                <div class="stat-label">Prix Moyen</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques des 30 derniers jours -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-3">Activité des 30 derniers jours</h2>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card bg-info text-white">
+                <div class="stat-icon"><i class="fas fa-calendar"></i></div>
+                <div class="stat-value">{{ stats_30_jours.commandes }}</div>
+                <div class="stat-label">Nouvelles Commandes</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card bg-success text-white">
+                <div class="stat-icon"><i class="fas fa-plus"></i></div>
+                <div class="stat-value">{{ stats_30_jours.nouveaux_menus }}</div>
+                <div class="stat-label">Nouveaux Menus</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card bg-warning text-white">
+                <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="stat-value">{{ stats_30_jours.chiffre_affaires }} FCFA</div>
+                <div class="stat-label">Chiffre d'Affaires</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menus Populaires et Revenus -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Menus les Plus Populaires</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Menu</th>
+                                    <th>Catégorie</th>
+                                    <th>Quantité</th>
+                                    <th>Revenus</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for menu in menus_populaires %}
+                                <tr>
+                                    <td>{{ menu.menu__nom }}</td>
+                                    <td><span class="badge bg-secondary">{{ menu.menu__categorie__nom }}</span></td>
+                                    <td>{{ menu.total_quantite }}</td>
+                                    <td>{{ menu.total_revenus }} FCFA</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">Aucun menu commandé</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Meilleurs Revenus par Menu</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Menu</th>
+                                    <th>Prix</th>
+                                    <th>Quantité</th>
+                                    <th>Revenus</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for menu in menus_revenus %}
+                                <tr>
+                                    <td>{{ menu.menu__nom }}</td>
+                                    <td>{{ menu.menu__prix }} FCFA</td>
+                                    <td>{{ menu.total_quantite }}</td>
+                                    <td><strong>{{ menu.total_revenus }} FCFA</strong></td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">Aucun revenu enregistré</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques par Catégorie et Menus Récents -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Performance par Catégorie</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Catégorie</th>
+                                    <th>Menus</th>
+                                    <th>Commandes</th>
+                                    <th>Revenus</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cat in stats_categories %}
+                                <tr>
+                                    <td>{{ cat.menu__categorie__nom }}</td>
+                                    <td>{{ cat.total_menus }}</td>
+                                    <td>{{ cat.total_commandes }}</td>
+                                    <td>{{ cat.revenus_categorie }} FCFA</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">Aucune donnée disponible</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Menus Récents</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Menu</th>
+                                    <th>Catégorie</th>
+                                    <th>Prix</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for menu in menus_recents %}
+                                <tr>
+                                    <td>{{ menu.nom }}</td>
+                                    <td><span class="badge bg-secondary">{{ menu.categorie.nom }}</span></td>
+                                    <td>{{ menu.prix }} FCFA</td>
+                                    <td>
+                                        {% if menu.disponible %}
+                                        <span class="badge bg-success">Disponible</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Indisponible</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">Aucun menu récent</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Commandes Récentes et Notifications -->
     <div class="row">
         <div class="col-md-8">

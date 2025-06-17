@@ -1,0 +1,198 @@
+{% extends 'base_restaurantly.html' %}
+{% load static %}
+
+{% block title %}{{ menu.nom }} - Bon Appétit{% endblock %}
+
+{% block body_class %}menu-detail-page{% endblock %}
+
+{% block content %}
+<!-- Page Title -->
+<section class="page-title d-flex align-items-center">
+  <div class="container position-relative text-center text-lg-start" data-aos="zoom-in" data-aos-delay="100">
+    <div class="d-flex">
+      <div>
+        <h1>{{ menu.nom }}</h1>
+        <p>{{ menu.categorie.nom }} - {{ menu.prix }}€</p>
+      </div>
+    </div>
+  </div>
+</section><!-- End Page Title -->
+
+<!-- Menu Detail Section -->
+<section class="menu-detail section">
+  <div class="container" data-aos="fade-up" data-aos-delay="100">
+    <div class="row gy-4">
+      <!-- Menu Image -->
+      <div class="col-lg-6">
+        <div class="menu-detail-img">
+          <img src="{% if menu.image %}{{ menu.image.url }}{% else %}{% static 'assets/img/menu/cake.jpg' %}{% endif %}" class="img-fluid" alt="{{ menu.nom }}">
+        </div>
+      </div>
+      
+      <!-- Menu Info -->
+      <div class="col-lg-6">
+        <div class="menu-detail-content">
+          <h3>{{ menu.nom }}</h3>
+          <div class="menu-meta mb-3">
+            <span class="badge bg-primary me-2">{{ menu.categorie.nom }}</span>
+            <span class="price h4 text-primary">{{ menu.prix }}€</span>
+          </div>
+          
+          <div class="menu-description mb-4">
+            <h5>Description</h5>
+            <p>{{ menu.description }}</p>
+          </div>
+          
+          {% if menu.ingredients %}
+          <div class="menu-ingredients mb-4">
+            <h5>Ingrédients</h5>
+            <p>{{ menu.ingredients }}</p>
+          </div>
+          {% endif %}
+          
+          <div class="menu-actions">
+            <div class="row align-items-center">
+              <div class="col-md-6">
+                <div class="quantity-controls d-flex align-items-center">
+                  <label for="quantity" class="me-3">Quantité:</label>
+                  <div class="input-group" style="width: 120px;">
+                    <button class="btn btn-outline-secondary" type="button" id="decreaseQuantity">-</button>
+                    <input type="number" class="form-control text-center" id="quantity" value="1" min="1" max="10">
+                    <button class="btn btn-outline-secondary" type="button" id="increaseQuantity">+</button>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <button class="btn btn-primary btn-lg w-100 add-to-cart-detail" data-menu-id="{{ menu.id_menu }}" data-menu-name="{{ menu.nom }}">
+                  <i class="bi bi-cart-plus"></i> Ajouter au panier
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="menu-navigation mt-4">
+            <div class="row">
+              <div class="col-6">
+                {% if previous_menu %}
+                <a href="{% url 'menus:detail_menu' previous_menu.id_menu %}" class="btn btn-outline-primary">
+                  <i class="bi bi-chevron-left"></i> Précédent
+                </a>
+                {% endif %}
+              </div>
+              <div class="col-6 text-end">
+                {% if next_menu %}
+                <a href="{% url 'menus:detail_menu' next_menu.id_menu %}" class="btn btn-outline-primary">
+                  Suivant <i class="bi bi-chevron-right"></i>
+                </a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section><!-- /Menu Detail Section -->
+
+<!-- Related Menus Section -->
+{% if related_menus %}
+<section class="related-menus section">
+  <div class="container" data-aos="fade-up" data-aos-delay="100">
+    <div class="section-title text-center">
+      <h2>Menus Similaires</h2>
+      <p>Découvrez d'autres délicieuses créations</p>
+    </div>
+    
+    <div class="row gy-4">
+      {% for related_menu in related_menus|slice:":4" %}
+      <div class="col-lg-3 col-md-6">
+        <div class="menu-item">
+          <img src="{% if related_menu.image %}{{ related_menu.image.url }}{% else %}{% static 'assets/img/menu/cake.jpg' %}{% endif %}" class="menu-img" alt="{{ related_menu.nom }}">
+          <div class="menu-content">
+            <a href="{% url 'menus:detail_menu' related_menu.id_menu %}">{{ related_menu.nom }}</a><span>{{ related_menu.prix }}€</span>
+          </div>
+          <div class="menu-ingredients">
+            {{ related_menu.description|truncatewords:8 }}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section><!-- /Related Menus Section -->
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+  // Gestion des contrôles de quantité
+  $('#increaseQuantity').click(function() {
+    var quantity = parseInt($('#quantity').val());
+    if (quantity < 10) {
+      $('#quantity').val(quantity + 1);
+    }
+  });
+  
+  $('#decreaseQuantity').click(function() {
+    var quantity = parseInt($('#quantity').val());
+    if (quantity > 1) {
+      $('#quantity').val(quantity - 1);
+    }
+  });
+  
+  // Gestion de l'ajout au panier
+  $('.add-to-cart-detail').click(function() {
+    var menuId = $(this).data('menu-id');
+    var menuName = $(this).data('menu-name');
+    var quantity = parseInt($('#quantity').val());
+    var button = $(this);
+    
+    // Désactiver le bouton pendant la requête
+    button.prop('disabled', true).html('<i class="bi bi-hourglass-split"></i> Ajout...');
+    
+    $.ajax({
+      url: '/commandes/ajouter_au_panier/' + menuId + '/',
+      method: 'POST',
+      data: JSON.stringify({
+        quantite: quantity
+      }),
+      contentType: 'application/json',
+      success: function(response) {
+        if (response.success) {
+          // Afficher un message de succès
+          button.html('<i class="bi bi-check-circle"></i> Ajouté !').removeClass('btn-primary').addClass('btn-success');
+          
+          // Déclencher l'événement de mise à jour du panier
+          document.dispatchEvent(new Event('cartUpdated'));
+          
+          // Remettre le bouton à l'état initial après 2 secondes
+          setTimeout(function() {
+            button.html('<i class="bi bi-cart-plus"></i> Ajouter au panier').removeClass('btn-success').addClass('btn-primary').prop('disabled', false);
+          }, 2000);
+        } else {
+          button.html('<i class="bi bi-exclamation-triangle"></i> Erreur').removeClass('btn-primary').addClass('btn-danger');
+          setTimeout(function() {
+            button.html('<i class="bi bi-cart-plus"></i> Ajouter au panier').removeClass('btn-danger').addClass('btn-primary').prop('disabled', false);
+          }, 2000);
+        }
+      },
+      error: function(xhr, status, error) {
+        console.log('Status:', xhr.status);
+        console.log('Response:', xhr.responseText);
+        
+        // Vérifier si c'est une redirection vers login
+        if (xhr.status === 401 || xhr.status === 403 || xhr.status === 302) {
+          window.location.href = '{% url "comptes:login" %}';
+        } else {
+          button.html('<i class="bi bi-exclamation-triangle"></i> Erreur').removeClass('btn-primary').addClass('btn-danger');
+          setTimeout(function() {
+            button.html('<i class="bi bi-cart-plus"></i> Ajouter au panier').removeClass('btn-danger').addClass('btn-primary').prop('disabled', false);
+          }, 2000);
+        }
+      }
+    });
+  });
+});
+</script>
+{% endblock %} 

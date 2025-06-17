@@ -1,0 +1,269 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>{% block title %}Bon Appétit - Restaurant{% endblock %}</title>
+  <meta name="description" content="Restaurant Bon Appétit - Découvrez nos délicieux menus">
+  <meta name="keywords" content="restaurant, cuisine, menu, bon appétit">
+
+  <!-- Favicons -->
+  <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
+
+  <!-- Custom CSS File -->
+  <link href="{% static 'assets/css/custom.css' %}" rel="stylesheet">
+
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body class="{% block body_class %}{% endblock %}">
+
+  <header id="header" class="header fixed-top">
+
+    <div class="topbar d-flex align-items-center">
+      <div class="container d-flex justify-content-center justify-content-md-between">
+        <div class="contact-info d-flex align-items-center">
+          <i class="bi bi-envelope d-flex align-items-center"><a href="mailto:contact@bonappetit.com">contact@bonappetit.com</a></i>
+          <i class="bi bi-phone d-flex align-items-center ms-4"><span>+33 1 23 45 67 89</span></i>
+        </div>
+        <div class="languages d-none d-md-flex align-items-center">
+          <ul>
+            <li>Fr</li>
+            <li><a href="#">En</a></li>
+          </ul>
+        </div>
+      </div>
+    </div><!-- End Top Bar -->
+
+    <div class="branding d-flex align-items-center">
+
+      <div class="container position-relative d-flex align-items-center justify-content-between">
+        <a href="{% url 'home' %}" class="logo d-flex align-items-center me-auto me-xl-0">
+          <h1 class="sitename">Bon Appétit</h1>
+        </a>
+
+        <nav id="navmenu" class="navmenu">
+          <ul>
+            <li><a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Accueil</a></li>
+            <li><a href="{% url 'menus:menu' %}" class="{% if 'menus' in request.resolver_match.url_name %}active{% endif %}">Menus</a></li>
+            {% if user.is_authenticated %}
+              <li><a href="{% url 'commandes:liste_commandes' %}" class="{% if 'liste_commandes' in request.resolver_match.url_name %}active{% endif %}">Mes Commandes</a></li>
+              <li><a href="{% url 'commandes:historique_commandes' %}" class="{% if 'historique_commandes' in request.resolver_match.url_name %}active{% endif %}">Historique</a></li>
+              {% if user.is_gestionnaire %}
+                <li><a href="{% url 'commandes:list_all_commandes' %}" class="{% if 'list_all_commandes' in request.resolver_match.url_name %}active{% endif %}">Gestion</a></li>
+              {% endif %}
+            {% endif %}
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+          <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+        </nav>
+
+        <div class="d-flex align-items-center">
+          {% if user.is_authenticated %}
+            <div class="cart-icon me-3 position-relative">
+              <a href="#" class="btn-cart" data-bs-toggle="modal" data-bs-target="#cartModal">
+                <i class="bi bi-cart3 fs-4"></i>
+                <span class="cart-count badge bg-danger position-absolute top-0 start-100 translate-middle" id="cartCount">
+                  {% if request.session.panier %}{{ request.session.panier|length }}{% else %}0{% endif %}
+                </span>
+              </a>
+            </div>
+            <div class="dropdown">
+              <a class="btn btn-outline-primary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-person-circle me-1"></i>{{ user.username }}
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'comptes:profile' %}">Mon Profil</a></li>
+                <li><a class="dropdown-item" href="{% url 'comptes:logout' %}">Déconnexion</a></li>
+              </ul>
+            </div>
+          {% else %}
+            <a class="btn-book-a-table d-none d-xl-block" href="{% url 'comptes:login' %}">Se Connecter</a>
+          {% endif %}
+        </div>
+
+      </div>
+
+    </div>
+
+  </header>
+
+  <main class="main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer id="footer" class="footer">
+    <div class="container">
+      <div class="row gy-3">
+        <div class="col-lg-3 col-md-6 d-flex">
+          <i class="bi bi-geo-alt icon"></i>
+          <div>
+            <h4>Adresse</h4>
+            <p>
+              123 Rue de la Gastronomie <br>
+              75001 Paris, France<br>
+            </p>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 footer-links d-flex">
+          <i class="bi bi-phone icon"></i>
+          <div>
+            <h4>Réservations</h4>
+            <p>
+              <strong>Téléphone:</strong> +33 1 23 45 67 89<br>
+              <strong>Email:</strong> contact@bonappetit.com<br>
+            </p>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 footer-links d-flex">
+          <i class="bi bi-clock icon"></i>
+          <div>
+            <h4>Horaires d'ouverture</h4>
+            <p>
+              <strong>Lundi-Samedi:</strong> 11:00 - 23:00<br>
+              <strong>Dimanche:</strong> 12:00 - 22:00<br>
+            </p>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 footer-links">
+          <h4>Suivez-nous</h4>
+          <div class="social-links d-flex">
+            <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+            <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+            <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="copyright">
+        &copy; Copyright <strong><span>Bon Appétit</span></strong>. Tous droits réservés
+      </div>
+    </div>
+  </footer>
+
+  <!-- Cart Modal -->
+  <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="cartModalLabel">Mon Panier</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="cartModalBody">
+          <!-- Le contenu du panier sera chargé ici -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+          <button type="button" class="btn btn-primary" id="btnCommander">Commander</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vendor JS Files -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/aos/aos.js' %}"></script>
+  <script src="{% static 'assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
+  <script src="{% static 'assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/isotope-layout/isotope.pkgd.min.js' %}"></script>
+
+  <!-- Main JS File -->
+  <script src="{% static 'assets/js/main.js' %}"></script>
+
+  <!-- Custom JS File -->
+  <script src="{% static 'assets/js/custom.js' %}"></script>
+
+  <!-- CSRF Token for AJAX requests -->
+  <script>
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+    
+    const csrftoken = getCookie('csrftoken');
+    
+    function csrfSafeMethod(method) {
+      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    
+    $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+          xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+      }
+    });
+  </script>
+
+  <!-- Cart functionality -->
+  <script>
+    // Charger le contenu du panier
+    function loadCartContent() {
+      $.get('{% url "commandes:cart_modal_content" %}', function(data) {
+        $('#cartModalBody').html(data);
+      });
+    }
+
+    // Mettre à jour le compteur du panier
+    function updateCartCount() {
+      $.get('{% url "commandes:get_cart_count" %}', function(data) {
+        $('#cartCount').text(data.count);
+      });
+    }
+
+    // Écouter l'événement de mise à jour du panier
+    document.addEventListener('cartUpdated', function() {
+      updateCartCount();
+      loadCartContent();
+    });
+
+    // Charger le contenu du panier quand le modal s'ouvre
+    $('#cartModal').on('show.bs.modal', function() {
+      loadCartContent();
+    });
+
+    // Gérer le bouton commander
+    $('#btnCommander').click(function() {
+      window.location.href = '{% url "commandes:nouvelle_commande" %}';
+    });
+  </script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html> 

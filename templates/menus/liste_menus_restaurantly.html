@@ -1,0 +1,426 @@
+{% extends 'base_restaurantly.html' %}
+{% load static %}
+
+{% block title %}Nos Menus - Bon Appétit{% endblock %}
+
+{% block body_class %}menu-page{% endblock %}
+
+{% block content %}
+<!-- Page Title -->
+<section class="page-title d-flex align-items-center">
+  <div class="container position-relative text-center text-lg-start" data-aos="zoom-in" data-aos-delay="100">
+    <div class="d-flex">
+      <div>
+        <h1>Nos Menus</h1>
+        <p>Découvrez nos délicieuses créations culinaires</p>
+      </div>
+    </div>
+  </div>
+</section><!-- End Page Title -->
+
+<!-- Menu Section -->
+<section id="menu" class="menu section">
+  <!-- Section Title -->
+  <div class="container section-title" data-aos="fade-up">
+    <h2>Menu</h2>
+    <p>Découvrez Nos Délicieuses Créations</p>
+  </div><!-- End Section Title -->
+
+  <div class="container isotope-layout" data-default-filter="*" data-layout="masonry" data-sort="original-order">
+    <!-- Menu Filters -->
+    <div class="row" data-aos="fade-up" data-aos-delay="100">
+      <div class="col-lg-12 d-flex justify-content-center">
+        <ul class="menu-filters isotope-filters">
+          <li data-filter="*" class="filter-active">Tous</li>
+          {% for categorie in categories %}
+          <li data-filter=".filter-{{ categorie.nom|lower|slugify }}">{{ categorie.nom }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div><!-- Menu Filters -->
+
+    <!-- Menu Container -->
+    <div class="row isotope-container" data-aos="fade-up" data-aos-delay="200">
+      {% for menu in menus %}
+      <div class="col-lg-6 menu-item isotope-item filter-{{ menu.categorie.nom|lower|slugify }}">
+        <div class="menu-image-area">
+          <div class="menu-image-bg">
+            <img src="{% if menu.image %}{{ menu.image.url }}{% else %}{% static 'assets/img/menu/cake.jpg' %}{% endif %}" class="menu-img" alt="{{ menu.nom }}">
+          </div>
+        </div>
+        <div class="menu-text-content">
+          <div class="menu-title-price-wrapper">
+            <div class="menu-title-box">
+              <a href="{% url 'menus:detail_menu' menu.id_menu %}" class="menu-name">{{ menu.nom }}</a>
+            </div>
+            <div class="menu-price-box">
+              <span class="menu-price">{{ menu.prix }}€</span>
+            </div>
+          </div>
+          {# La description est retirée pour correspondre à l'image fournie par l'utilisateur #}
+          {#
+          <div class="menu-ingredients">
+            {{ menu.description|truncatewords:15 }}
+          </div>
+          #}
+          <div class="menu-actions">
+            <button class="btn btn-primary btn-sm add-to-cart" data-menu-id="{{ menu.id_menu }}" data-menu-name="{{ menu.nom }}">
+              <i class="bi bi-cart-plus"></i> Ajouter au panier
+            </button>
+            <a href="{% url 'menus:detail_menu' menu.id_menu %}" class="btn btn-outline-primary btn-sm">
+              <i class="bi bi-eye"></i> Voir détails
+            </a>
+          </div>
+        </div>
+      </div><!-- Menu Item -->
+      {% empty %}
+      <div class="col-12 text-center">
+        <p>Aucun menu disponible pour le moment.</p>
+      </div>
+      {% endfor %}
+    </div><!-- Menu Container -->
+  </div>
+</section><!-- /Menu Section -->
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Styles pour les éléments de menu */
+.menu-item {
+  background: #212121; /* Dark background for the entire card */
+  border-radius: 10px;
+  overflow: hidden; /* Important to hide the overflowing parts */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  margin-bottom: 30px;
+  display: flex; /* Always flex, row layout for image and text content */
+  align-items: center; /* Vertically align items in the middle */
+  min-height: 170px; /* Ensure a minimum height for all cards, adjusted */
+  position: relative; /* For positioning of the image area */
+  padding-right: 20px; /* Padding for the content on the right */
+  padding-left: 145px; /* Adjusted to compensate for overflowing image */
+}
+
+.menu-item:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.menu-image-area {
+  position: absolute;
+  left: -25px; /* Pull it slightly to the left to overflow as per image */
+  top: 15px; /* Positioned higher than center as per image */
+  width: 150px; /* Fixed width for the entire image area including the white part */
+  height: 150px; /* Fixed height for the entire image area including the white part */
+  z-index: 2; /* To make it appear above the content */
+  overflow: hidden; /* To clip the circular image */
+}
+
+.menu-image-bg {
+  width: 100%; /* Take full width of parent (menu-image-area) */
+  height: 100%; /* Take full height of parent (menu-image-area) */
+  background-color: #ffffff; /* White background */
+  border: 4px solid #cda45e; /* Golden border */
+  border-radius: 50%; /* Make it circular */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; /* Hide parts of the image that exceed the circle */
+}
+
+.menu-img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.menu-text-content {
+  flex-grow: 1;
+  padding: 0; /* Padding handled by .menu-item */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.menu-title-price-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px; /* Space between title/price and buttons */
+  width: 100%; /* Ensure it takes full width */
+}
+
+.menu-title-box, .menu-price-box {
+  background-color: #1a1814; /* Elegant black background */
+  padding: 8px 15px;
+  border-radius: 5px;
+}
+
+.menu-title-box {
+  flex-grow: 1;
+  margin-right: 10px; /* Space between name and price box */
+}
+
+.menu-title-box .menu-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px; /* Slightly larger for prominence */
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.menu-title-box .menu-name:hover {
+  color: #cda45e;
+}
+
+.menu-price-box .menu-price {
+  font-family: 'Impact', sans-serif;
+  font-size: 24px; /* Slightly larger price */
+  font-weight: 600;
+  color: #cda45e; /* Golden */
+}
+
+.menu-ingredients {
+  display: none; /* Hide description as per example image */
+}
+
+.menu-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start; /* Align buttons to the left */
+  padding: 0;
+}
+
+.menu-actions .btn {
+  border-radius: 50px;
+  padding: 12px 30px; /* Adhering to UX rules */
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 14px; /* Adhering to UX rules */
+  transition: all 0.3s ease;
+}
+
+.menu-actions .btn-primary {
+  background: #cda45e;
+  border-color: #cda45e;
+  color: #fff;
+}
+
+.menu-actions .btn-primary:hover {
+  background: #b8944e;
+  border-color: #b8944e;
+  color: #fff;
+}
+
+.menu-actions .btn-outline-primary {
+  color: #cda45e;
+  border: 2px solid #cda45e;
+  background: transparent;
+}
+
+.menu-actions .btn-outline-primary:hover {
+  background: #cda45e;
+  color: #fff;
+}
+
+/* Filtres de menu */
+.menu-filters {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 30px 0;
+  text-align: center;
+}
+
+.menu-filters li {
+  cursor: pointer;
+  display: inline-block;
+  margin: 0 10px 10px 10px;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 600;
+  line-height: 1;
+  padding: 10px 15px;
+  margin-bottom: 5px;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  color: #fff; /* Couleur du texte par défaut */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Bordure subtile */
+}
+
+.menu-filters li:hover, .menu-filters .filter-active {
+  background: #cda45e;
+  color: #fff;
+  border-color: #cda45e;
+}
+
+/* Ajustements pour les titres de section */
+.section-title h2 {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 0;
+  margin: 0;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.section-title h2::after {
+  content: "";
+  width: 120px;
+  height: 1px;
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 4px 10px;
+}
+
+.section-title p {
+  margin: 0;
+  margin-top: 5px;
+  font-size: 36px;
+  font-weight: 700;
+  font-family: 'Amatic SC', sans-serif;
+  color: #cda45e;
+}
+
+/* Ajustement pour le titre de la page */
+.page-title {
+  background: url('{% static "assets/img/hero-bg.jpg" %}') center center;
+  background-size: cover;
+  position: relative;
+  padding: 120px 0;
+  color: #fff;
+}
+
+.page-title::before {
+  content: "";
+  background: rgba(0, 0, 0, 0.5);
+  position: absolute;
+  inset: 0;
+}
+
+.page-title h1 {
+  font-size: 48px;
+  font-weight: 700;
+  font-family: 'Amatic SC', sans-serif;
+  margin: 0;
+}
+
+.page-title p {
+  font-size: 18px;
+  font-family: 'Open Sans', sans-serif;
+}
+
+/* Media queries for responsive (no stack, maintain current layout) */
+@media (max-width: 768px) {
+  .menu-item {
+    padding-left: 145px; /* Maintain the padding for overflow on smaller screens */
+    min-height: 150px; /* Adjust min-height for mobile if needed */
+  }
+
+  .menu-image-area {
+    left: -25px; /* Maintain overflow position */
+    top: 15px; /* Maintain vertical position */
+    width: 130px;
+    height: 130px;
+  }
+
+  .menu-image-bg {
+    width: 130px;
+    height: 130px;
+  }
+
+  .menu-img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .menu-text-content {
+    padding-right: 10px; /* Reduce right padding on mobile */
+  }
+
+  .menu-title-box .menu-name {
+    font-size: 22px; /* Slightly smaller font for mobile */
+  }
+
+  .menu-price-box .menu-price {
+    font-size: 20px; /* Slightly smaller font for mobile */
+  }
+
+  .menu-actions .btn {
+    padding: 10px 20px; /* Smaller buttons on mobile */
+    font-size: 12px;
+  }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+  // Gestion des filtres de menu
+  $('.menu-filters li').on('click', function() {
+    $('.menu-filters li').removeClass('filter-active');
+    $(this).addClass('filter-active');
+    
+    var filterValue = $(this).attr('data-filter');
+    $('.isotope-container').isotope({
+      filter: filterValue
+    });
+  });
+
+  // Gestion de l'ajout au panier
+  $('.add-to-cart').click(function() {
+    var menuId = $(this).data('menu-id');
+    var menuName = $(this).data('menu-name');
+    var button = $(this);
+    
+    // Désactiver le bouton pendant la requête
+    button.prop('disabled', true).html('<i class="bi bi-hourglass-split"></i> Ajout...');
+    
+    $.ajax({
+      url: '/commandes/ajouter_au_panier/' + menuId + '/',
+      method: 'POST',
+      data: JSON.stringify({
+        quantite: 1
+      }),
+      contentType: 'application/json',
+      success: function(response) {
+        if (response.success) {
+          // Afficher un message de succès
+          button.html('<i class="bi bi-check-circle"></i> Ajouté !').removeClass('btn-primary').addClass('btn-success');
+          
+          // Déclencher l'événement de mise à jour du panier
+          document.dispatchEvent(new Event('cartUpdated'));
+          
+          // Remettre le bouton à l'état initial après 2 secondes
+          setTimeout(function() {
+            button.html('<i class="bi bi-cart-plus"></i> Ajouter au panier').removeClass('btn-success').addClass('btn-primary').prop('disabled', false);
+          }, 2000);
+        } else {
+          button.html('<i class="bi bi-exclamation-triangle"></i> Erreur').removeClass('btn-primary').addClass('btn-danger');
+          setTimeout(function() {
+            button.html('<i class="bi bi-cart-plus"></i> Ajouter au panier').removeClass('btn-danger').addClass('btn-primary').prop('disabled', false);
+          }, 2000);
+        }
+      },
+      error: function(xhr, status, error) {
+        console.log('Status:', xhr.status);
+        console.log('Response:', xhr.responseText);
+        
+        // Vérifier si c'est une redirection vers login
+        if (xhr.status === 401 || xhr.status === 403 || xhr.status === 302) {
+          window.location.href = '{% url "comptes:login" %}';
+        } else {
+          button.html('<i class="bi bi-exclamation-triangle"></i> Erreur').removeClass('btn-primary').addClass('btn-danger');
+          setTimeout(function() {
+            button.html('<i class="bi bi-cart-plus"></i> Ajouter au panier').removeClass('btn-danger').addClass('btn-primary').prop('disabled', false);
+          }, 2000);
+        }
+      }
+    });
+  });
+});
+</script>
+{% endblock %} 

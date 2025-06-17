@@ -55,7 +55,10 @@ def update_commande_status_view(request, commande_id):
 
             # Create notification for the client
             client_user = commande.client
-            message_text = f"Le statut de votre commande #{commande.id} a été mis à jour de '{old_status}' à '{commande.get_etat_display()}'."
+            if new_status == 'RETIREE':
+                message_text = f"Votre commande #{commande.id} a été retirée avec succès ! Elle a été déplacée vers votre historique des commandes."
+            else:
+                message_text = f"Le statut de votre commande #{commande.id} a été mis à jour de '{old_status}' à '{commande.get_etat_display()}'."
             Notification.objects.create(user=client_user, message=message_text)
 
             messages.success(request, f"Le statut de la commande #{commande.id} a été mis à jour et le client notifié.")
@@ -69,9 +72,18 @@ def update_commande_status_view(request, commande_id):
 def liste_commandes(request):
     commandes = Commande.objects.filter(
         client=request.user,
-        etat__in=['EN_ATTENTE', 'EN_PREPARATION']
+        etat__in=['EN_ATTENTE', 'EN_PREPARATION', 'PRETE']
     ).prefetch_related('lignes').order_by('-date_commande')
-    return render(request, 'commandes/liste_commandes.html', {'commandes': commandes})
+    return render(request, 'commandes/liste_commandes_restaurantly.html', {'commandes': commandes})
+
+@client_required
+@login_required
+def historique_commandes(request):
+    commandes = Commande.objects.filter(
+        client=request.user,
+        etat__in=['RETIREE', 'ANNULEE']
+    ).prefetch_related('lignes').order_by('-date_commande')
+    return render(request, 'commandes/historique_commandes_restaurantly.html', {'commandes': commandes})
 
 @client_required
 @login_required
@@ -174,7 +186,7 @@ def voir_panier(request):
         'total': total
     })
 
-@login_required
+@login_required(login_url='comptes:login')
 def ajouter_au_panier(request, menu_id):
     if request.method == 'POST':
         panier = request.session.get('panier', {})
@@ -296,7 +308,7 @@ def nouvelle_commande(request):
         'total': total
     })
 
-@login_required
+@login_required(login_url='comptes:login')
 def detail_commande(request, commande_id):
     commande = get_object_or_404(Commande, id=commande_id)
     
@@ -318,14 +330,14 @@ def detail_commande(request, commande_id):
             'sous_total': ligne.quantite * ligne.prix_unitaire
         })
     
-    return render(request, 'commandes/detail_commande.html', {
+    return render(request, 'commandes/detail_commande_restaurantly.html', {
         'commande': commande,
         'items': items,
         'total': commande.montant_total
     })
 
 @require_POST
-@login_required
+@login_required(login_url='comptes:login')
 def annuler_commande(request, commande_id):
     commande = get_object_or_404(Commande, id=commande_id)
     if commande.client != request.user and not request.user.is_staff:
@@ -345,7 +357,7 @@ def annuler_commande(request, commande_id):
     messages.success(request, "La commande a été annulée avec succès.")
     return redirect('commandes:detail_commande', commande_id=commande.id)
 
-@login_required
+@login_required(login_url='comptes:login')
 def confirmer_commande(request, commande_id):
     commande = get_object_or_404(Commande, id=commande_id)
     
@@ -366,7 +378,7 @@ def confirmer_commande(request, commande_id):
     messages.success(request, "La commande a été confirmée avec succès.")
     return redirect('commandes:detail_commande', commande_id=commande.id)
 
-@login_required
+@login_required(login_url='comptes:login')
 def get_cart_count(request):
     panier = request.session.get('panier', {})
     count = sum(panier.values())
@@ -392,7 +404,7 @@ def cart_modal_content(request):
         except Menu.DoesNotExist:
             continue
     
-    return render(request, 'commandes/cart_modal_content.html', {
+    return render(request, 'commandes/cart_modal_content_restaurantly.html', {
         'items': items,
         'total': total
     })

@@ -1,0 +1,399 @@
+/* Custom styles for Bon Appétit Restaurant */
+
+/* Cart icon styling */
+.cart-icon {
+    position: relative;
+}
+
+.cart-count {
+    font-size: 0.7rem;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Menu item styling */
+.menu-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.menu-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+}
+
+.menu-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px 8px 0 0;
+}
+
+.menu-content {
+    padding: 15px;
+    background: #fff;
+    border-radius: 0 0 8px 8px;
+}
+
+.menu-content a {
+    color: #333;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.menu-content span {
+    float: right;
+    color: #cda45e;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.menu-ingredients {
+    padding: 0 15px 15px;
+    background: #fff;
+    color: #666;
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+.menu-actions {
+    padding: 0 15px 15px;
+    background: #fff;
+}
+
+/* Menu detail styling */
+.menu-detail-img img {
+    border-radius: 12px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+}
+
+.menu-detail-content {
+    padding: 20px;
+}
+
+.menu-detail-content h3 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.price {
+    color: #cda45e !important;
+    font-weight: 700;
+}
+
+/* Cart modal styling */
+.cart-item {
+    transition: all 0.3s ease;
+}
+
+.cart-item:hover {
+    background-color: #f8f9fa;
+}
+
+.quantity-controls button {
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #dee2e6;
+    background: #fff;
+    transition: all 0.2s ease;
+}
+
+.quantity-controls button:hover {
+    background: #cda45e;
+    border-color: #cda45e;
+    color: #fff;
+}
+
+.quantity-display {
+    min-width: 30px;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Page title styling */
+.page-title {
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../img/page-title-bg.webp');
+    background-size: cover;
+    background-position: center;
+    min-height: 300px;
+    color: #fff;
+}
+
+.page-title h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.page-title p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+/* Button styling */
+.cta-btn {
+    background: #cda45e;
+    border: 2px solid #cda45e;
+    color: #fff;
+    padding: 12px 30px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.cta-btn:hover {
+    background: transparent;
+    color: #cda45e;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: #cda45e;
+    border-color: #cda45e;
+}
+
+.btn-primary:hover {
+    background: #b8944e;
+    border-color: #b8944e;
+}
+
+.btn-outline-primary {
+    color: #cda45e;
+    border-color: #cda45e;
+}
+
+.btn-outline-primary:hover {
+    background: #cda45e;
+    border-color: #cda45e;
+}
+
+/* Section styling */
+.section {
+    padding: 80px 0;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.section-title h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.section-title p {
+    font-size: 1.1rem;
+    color: #666;
+    font-style: italic;
+}
+
+/* Hero section */
+.hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    color: #fff;
+}
+
+.hero img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+
+.hero h2 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.hero h2 span {
+    color: #cda45e;
+}
+
+.hero p {
+    font-size: 1.3rem;
+    margin-bottom: 30px;
+    opacity: 0.9;
+}
+
+/* About section */
+.about-img {
+    border-radius: 12px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+}
+
+.about .content h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.about .content ul {
+    list-style: none;
+    padding: 0;
+}
+
+.about .content ul li {
+    padding: 10px 0;
+    display: flex;
+    align-items: flex-start;
+}
+
+.about .content ul li i {
+    color: #cda45e;
+    margin-right: 15px;
+    margin-top: 3px;
+}
+
+/* Card items */
+.card-item {
+    text-align: center;
+    padding: 30px 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.card-item:hover {
+    transform: translateY(-10px);
+}
+
+.card-item span {
+    display: inline-block;
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    background: #cda45e;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.card-item h4 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.card-item h4 a {
+    color: #333;
+    text-decoration: none;
+}
+
+.card-item p {
+    color: #666;
+    line-height: 1.6;
+}
+
+/* Contact section */
+.info-item {
+    margin-bottom: 30px;
+}
+
+.info-item i {
+    color: #cda45e;
+    font-size: 1.5rem;
+    margin-right: 20px;
+    margin-top: 5px;
+}
+
+.info-item h4 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.info-item p {
+    color: #666;
+    margin: 0;
+}
+
+/* Footer */
+.footer {
+    background: #1a1814;
+    color: #fff;
+    padding: 60px 0 20px;
+}
+
+.footer h4 {
+    color: #cda45e;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.footer .icon {
+    color: #cda45e;
+    font-size: 1.5rem;
+    margin-right: 20px;
+    margin-top: 5px;
+}
+
+.social-links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: #cda45e;
+    color: #fff;
+    border-radius: 50%;
+    margin-right: 10px;
+    transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+    background: #b8944e;
+    transform: translateY(-3px);
+}
+
+.copyright {
+    text-align: center;
+    padding-top: 30px;
+    border-top: 1px solid #333;
+    margin-top: 40px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .hero h2 {
+        font-size: 2.5rem;
+    }
+    
+    .page-title h1 {
+        font-size: 2rem;
+    }
+    
+    .section-title h2 {
+        font-size: 2rem;
+    }
+    
+    .menu-item {
+        margin-bottom: 30px;
+    }
+} 
