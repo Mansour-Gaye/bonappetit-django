@@ -1,11 +1,18 @@
 from django.db import models
+from django.utils.text import slugify
 
 # Create your models here.
 class Categorie(models.Model):
     id_categorie = models.AutoField(primary_key=True)
-    nom = models.CharField(max_length=50, unique=True, null=False, blank=False)
-    description = models.TextField(null=True, blank=True)
-    ordre_affichage = models.IntegerField(default=0)
+    nom = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True, null=True)
+    ordre_affichage = models.PositiveIntegerField(default=0, help_text="Ordre d'affichage de la catégorie")
+
+    def get_slug(self):
+        return slugify(self.nom)
+
+    class Meta:
+        ordering = ['ordre_affichage', 'nom']
 
     def __str__(self):
         return self.nom

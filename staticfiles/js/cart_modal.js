@@ -1,4 +1,86 @@
+// Gestionnaire d'erreur global pour capturer toutes les erreurs
+window.addEventListener('error', function(e) {
+    console.error('ERREUR GLOBALE CAPTURÉE:', e.error);
+    console.error('Message:', e.message);
+    console.error('Fichier:', e.filename);
+    console.error('Ligne:', e.lineno);
+    console.error('Colonne:', e.colno);
+    return false;
+});
+
+// Gestionnaire pour les promesses non gérées
+window.addEventListener('unhandledrejection', function(e) {
+    console.error('PROMESSE NON GÉRÉE:', e.reason);
+    return false;
+});
+
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('CART MODAL JS CHARGÉ - VERSION DEBUG'); // Debug pour forcer le cache
+    console.log('TEST: Le JS cart_modal.js est bien chargé !');
+    // Initialisation : Mettre à jour le compteur au chargement
+    updateCartCount();
+    
+    // Recharger le contenu du panier quand la modale s'ouvre
+    const cartModal = document.getElementById('cartModal');
+    if (cartModal) {
+        cartModal.addEventListener('show.bs.modal', function() {
+            reloadCartModal();
+        });
+    }
+
+    // Gestion de tous les formulaires d'ajout au panier
+    const forms = document.querySelectorAll('.add-to-cart-form');
+    console.log('DEBUG: Nombre de formulaires trouvés:', forms.length);
+    forms.forEach(form => {
+        console.log('DEBUG: Ajout d\'event listener sur le formulaire:', form.action);
+        form.addEventListener('submit', function(e) {
+            console.log('DEBUG: Formulaire soumis, action:', form.action);
+            // On autorise l'ajout au panier même si non connecté
+            // Plus de redirection ni de stockage d'intention
+            e.preventDefault(); // Empêche la redirection
+
+            const button = form.querySelector('button[type="submit"]');
+            const originalButtonHtml = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            // Correction : utiliser FormData pour compatibilité Django
+            const formData = new FormData(form);
+
+            console.log('DEBUG: Envoi de la requête fetch vers:', form.action);
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: formData
+            })
+            .then(response => {
+                console.log('DEBUG: Réponse reçue, status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('DEBUG: Données reçues:', data);
+                if (data.status === 'success' || data.success) {
+                    updateCartCount(); // Mettre à jour le compteur
+                    showSuccessNotification('Article ajouté au panier !');
+                } else {
+                    console.error('Erreur lors de l\'ajout au panier:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('DEBUG: Erreur Fetch:', error);
+            })
+            .finally(() => {
+                // Réactiver le bouton après un court délai
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.innerHTML = originalButtonHtml;
+                }, 500);
+            });
+        });
+    });
+
     // Gestion des boutons d'augmentation de quantité
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('increase-quantity')) {
@@ -82,6 +164,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Mettre à jour le compteur du panier dans la navbar
                 updateCartCount();
+                // Recharger le contenu du modal
+                reloadCartModal();
             } else {
                 console.error('Erreur:', data.message);
             }
@@ -125,6 +209,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Mettre à jour le compteur du panier dans la navbar
                 updateCartCount();
+                // Recharger le contenu du modal
+                reloadCartModal();
             } else {
                 console.error('Erreur:', data.message);
             }
@@ -160,6 +246,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     // Mettre à jour le compteur du panier dans la navbar
                     updateCartCount();
+                    // Recharger le contenu du modal
+                    reloadCartModal();
                 } else {
                     console.error('Erreur:', data.message);
                 }
@@ -204,5 +292,40 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         return cookieValue;
+    }
+
+    // Fonction pour recharger dynamiquement le contenu du modal panier
+    function reloadCartModal() {
+        fetch('/commandes/panier/modal/')
+        .then(response => response.text())
+        .then(html => {
+            // Remplacer le contenu du modal (adapter le sélecteur à votre structure)
+            const modalBody = document.querySelector('#cartModal .modal-body, .cart-modal-body');
+            if (modalBody) {
+                modalBody.innerHTML = html;
+            }
+        })
+        .catch(error => {
+            console.error('Erreur lors du rechargement du panier:', error);
+        });
+    }
+
+    // Fonction pour afficher une notification de succès
+    function showSuccessNotification(message) {
+        const notification = document.createElement('div');
+        notification.className = 'alert alert-success alert-dismissible fade show';
+        notification.style.position = 'fixed';
+        notification.style.top = '20px';
+        notification.style.right = '20px';
+        notification.style.zIndex = '1050';
+        notification.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => { notification.remove(); }, 150);
+        }, 3000);
     }
 }); 

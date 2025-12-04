@@ -13,6 +13,8 @@ from commandes.models import Commande, LigneCommande
 from menus.models import Menu, Categorie
 from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_POST
+import random
 
 User = get_user_model()
 
@@ -22,21 +24,12 @@ def is_gestionnaire_check(user):
     return user.is_authenticated and user.is_gestionnaire
 
 def home(request):
-    if request.user.is_authenticated:
-        if request.user.is_gestionnaire:
-            return redirect('comptes:gestionnaire_dashboard')
-        else:
-            return redirect('comptes:mon_compte')
-    else:
-        # Afficher une page d'accueil publique avec le design Restaurantly
-        menus_preview = Menu.objects.filter(disponible=True).select_related('categorie').order_by('?')[:6]
-        return render(request, 'home_restaurantly.html', {
-            'menus_preview': menus_preview
-        })
+    menus_disponibles = list(Menu.objects.filter(disponible=True))
+    best_sellers = random.sample(menus_disponibles, min(3, len(menus_disponibles))) if menus_disponibles else []
+    return render(request, 'comptes/home.html', {'best_sellers': best_sellers})
 
-@login_required
 def profile(request):
-    return render(request, 'comptes/profile_restaurantly.html')
+    return render(request, 'comptes/profile.html')
 
 def register(request):
     if request.method == 'POST':
@@ -53,9 +46,8 @@ def register(request):
             messages.error(request, "Erreur d'inscription. Veuillez corriger les erreurs ci-dessous.")
     else:
         form = CustomUserCreationForm()
-    return render(request, 'comptes/register_restaurantly.html', {'form': form})
+    return render(request, 'comptes/register.html', {'form': form})
 
-@ensure_csrf_cookie
 def user_login(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
@@ -65,59 +57,32 @@ def user_login(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                messages.info(request, f"Bienvenue {username} !")
-                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return JsonResponse({
-                        'success': True,
-                        'redirect': 'comptes:gestionnaire_dashboard' if user.is_gestionnaire else 'comptes:mon_compte'
-                    })
                 if user.is_gestionnaire:
                     return redirect('comptes:gestionnaire_dashboard')
                 else:
                     return redirect('comptes:mon_compte')
             else:
-                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return JsonResponse({
-                        'success': False,
-                        'error': "Nom d'utilisateur ou mot de passe incorrect."
-                    }, status=400)
                 messages.error(request, "Nom d'utilisateur ou mot de passe incorrect.")
         else:
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({
-                    'success': False,
-                    'error': "Nom d'utilisateur ou mot de passe incorrect. Veuillez vérifier les champs."
-                }, status=400)
             messages.error(request, "Nom d'utilisateur ou mot de passe incorrect. Veuillez vérifier les champs.")
     else:
         form = AuthenticationForm()
-    return render(request, 'comptes/login_restaurantly.html', {'form': form})
+    return render(request, 'comptes/login.html', {'form': form})
 
 def user_logout(request):
     logout(request)
-    messages.info(request, "Vous avez été déconnecté.")
     return redirect('comptes:login')
 
 # Add new views for mon_compte and gestionnaire_dashboard
 
-@login_required
 def mon_compte_view(request):
-    # Récupérer les notifications non lues
-    notifications = Notification.objects.filter(
-        user=request.user,
-        is_read=False
-    ).order_by('-created_at')
-    
-    # Récupérer l'historique des commandes
-    commandes = Commande.objects.filter(
-        client=request.user
-    ).order_by('-date_commande')
-    
+    notifications = Notification.objects.filter(user=request.user, is_read=False).order_by('-created_at')
+    commandes = Commande.objects.filter(client=request.user).order_by('-date_commande')
     context = {
         'notifications': notifications,
         'commandes': commandes
     }
-    return render(request, 'comptes/mon_compte_restaurantly.html', context)
+    return render(request, 'comptes/mon_compte.html', context)
 
 @login_required
 @user_passes_test(is_gestionnaire_check, login_url='comptes:login')
@@ -276,6 +241,7 @@ def promote_user(request, user_id):
     user.is_gestionnaire = True
     user.save()
     messages.success(request, f"L'utilisateur {user.username} est maintenant gestionnaire.")
+    messages.info(request, f"{user.username} a désormais accès à l'espace gestionnaire.")
     return redirect('comptes:gestion_utilisateurs')
 
 @login_required
@@ -286,5 +252,12 @@ def delete_user(request, user_id):
         username = user.username
         user.delete()
         messages.success(request, f"L'utilisateur {username} a été supprimé.")
+        messages.warning(request, f"Attention : toutes les données associées à cet utilisateur sont supprimées.")
         return redirect('comptes:gestion_utilisateurs')
     return render(request, 'comptes/gestionnaire/delete_user.html', {'user': user})
+
+@require_POST
+@login_required
+def mark_all_notifications_read(request):
+    Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
+    return JsonResponse({'success': True})

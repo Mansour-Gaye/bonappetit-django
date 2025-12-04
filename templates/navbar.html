@@ -1,28 +1,56 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-  <div class="container">
-    <a class="navbar-brand" href="{% url 'home' %}">Bon Appétit</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4 px-lg-5 py-3 py-lg-0">
+    <a href="{% url 'comptes:home' %}" class="navbar-brand p-0">
+        <h1 class="text-primary m-0"><i class="fa fa-utensils me-3"></i>Bon Appétit</h1>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+        <span class="fa fa-bars"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <!-- Remplace temporairement ce lien -->
-          <a class="nav-link" href="{% url 'menus:menu' %}">Menus</a>
-        </li>
-        {% if user.is_authenticated %}
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'comptes:logout' %}">Déconnexion</a>
-        </li>
-        {% else %}
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'comptes:login' %}">Connexion</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'comptes:register' %}">Inscription</a>
-        </li>
-        {% endif %}
-      </ul>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <div class="navbar-nav ms-auto py-0 pe-4">
+            <a href="{% url 'comptes:home' %}" class="nav-item nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Accueil</a>
+            <a href="{% url 'menus:menu' %}" class="nav-item nav-link {% if request.resolver_match.url_name == 'menu' %}active{% endif %}">Menu</a>
+            
+            {% if user.is_authenticated %}
+                {% if user.is_gestionnaire %}
+                    <a href="{% url 'comptes:gestionnaire_dashboard' %}" class="nav-item nav-link">Dashboard</a>
+                    <a href="{% url 'commandes:list_all_commandes' %}" class="nav-item nav-link">Commandes</a>
+                    <a href="{% url 'menus:gestion_menus' %}" class="nav-item nav-link">Gestion Menus</a>
+                {% else %}
+                    <a href="{% url 'commandes:liste_commandes_client' %}" class="nav-item nav-link">Mes Commandes</a>
+                {% endif %}
+                
+                <!-- Icône notifications -->
+                <a href="#" id="notification-icon" class="nav-item nav-link position-relative" data-bs-toggle="modal" data-bs-target="#notificationsModal" aria-expanded="false">
+                    <i class="bi bi-bell-fill fs-5"></i>
+                    {% if unread_notifications|length %}
+                        <span id="notification-badge" class="new">{{ unread_notifications|length }}</span>
+                    {% else %}
+                        <span id="notification-badge" class="d-none">0</span>
+                    {% endif %}
+                </a>
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">{{ user.username }}</a>
+                    <div class="dropdown-menu m-0">
+                        <a href="{% url 'comptes:mon_compte' %}" class="dropdown-item">Mon Compte</a>
+                        <a href="{% url 'comptes:logout' %}" class="dropdown-item">Déconnexion</a>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{% url 'comptes:login' %}" class="nav-item nav-link">Connexion</a>
+                <a href="{% url 'comptes:register' %}" class="nav-item nav-link">Inscription</a>
+            {% endif %}
+        </div>
+        
+        <!-- Panier avec compteur -->
+        <a href="#" id="cart-icon" class="nav-item nav-link" data-bs-toggle="modal" data-bs-target="#cartModal">
+            <span class="position-relative d-inline-block">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-count" id="cartCount">
+                    {{ cart_item_count|default:"0" }}
+                </span>
+            </span>
+        </a>
     </div>
-  </div>
 </nav>
+<!-- Modale du Panier -->
+{% include 'commandes/partials/cart_modal.html' %}

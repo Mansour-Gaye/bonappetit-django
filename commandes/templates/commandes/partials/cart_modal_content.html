@@ -1,0 +1,60 @@
+<div class="cart-design p-3">
+    <!-- En-tête des colonnes -->
+    <div class="row text-muted mx-0" style="font-size: 0.8rem; font-weight: 500; text-transform: uppercase;">
+        <div class="col-5">Menu</div>
+        <div class="col-3 text-center">Quantité</div>
+        <div class="col-4 text-end">Sous-total</div>
+    </div>
+    <hr class="my-2">
+
+    <div class="cart-items-container">
+        {% if items %}
+            {% for item in items %}
+            <!-- Ligne d'un article -->
+            <div class="row align-items-center py-2 mx-0 {% if not forloop.last %}border-bottom{% endif %}">
+                <div class="col-5">
+                    <div class="d-flex align-items-center">
+                        <img src="{{ item.menu.image.url }}" alt="{{ item.menu.nom }}" class="rounded" style="width: 45px; height: 45px; object-fit: cover;">
+                        <div class="ms-3">
+                            <h6 class="mb-0 item-name-final">{{ item.menu.nom }}</h6>
+                            <span class="badge item-price-badge-final">{{ item.menu.prix|floatformat:0 }} FCFA</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="d-flex justify-content-center align-items-center">
+                        <button class="btn btn-sm btn-quantity-final btn-decrease" data-menu-id="{{ item.menu.id_menu }}">-</button>
+                        <span class="mx-2 fw-bold quantity-display-final">{{ item.quantite }}</span>
+                        <button class="btn btn-sm btn-quantity-final btn-increase" data-menu-id="{{ item.menu.id_menu }}">+</button>
+                    </div>
+                </div>
+                <div class="col-3 text-end">
+                    <span class="fw-bold subtotal-final">{{ item.sous_total|floatformat:0 }} FCFA</span>
+                </div>
+                <div class="col-1 text-end">
+                    <button class="btn btn-sm btn-remove-final" data-menu-id="{{ item.menu.id_menu }}">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <!-- Message pour panier vide -->
+            <div class="text-center py-4">
+                <p class="text-muted mb-0">Votre panier est vide.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Pied de la modale -->
+    <hr class="my-2">
+    <div class="d-flex justify-content-between align-items-center pt-2">
+        <button class="btn btn-sm btn-clear-cart-final btn-clear-cart">
+            <i class="fas fa-trash-alt me-1"></i>Vider
+        </button>
+        <h5 class="mb-0 total-final">Total : <span class="fw-bold">{{ total|floatformat:0|default:"0" }} FCFA</span></h5>
+        <a href="{% url 'commandes:nouvelle_commande' %}" class="btn btn-warning fw-bold btn-checkout-final {% if not items %}disabled{% endif %}">
+            Passer la commande
+        </a>
+    </div>
+</div> 

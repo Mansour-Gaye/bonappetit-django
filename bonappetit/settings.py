@@ -61,9 +61,12 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'commandes.context_processors.cart_item_count',
+                'comptes.context_processors.notifications_context',
             ],
         },
     },
@@ -162,7 +165,7 @@ CSRF_TRUSTED_ORIGINS = [
 # Redirect URLs for login and logout
 LOGIN_REDIRECT_URL = 'comptes:home'
 LOGOUT_REDIRECT_URL = 'comptes:login'
-# LOGIN_URL = 'comptes:login' # If you want to override the default /accounts/login/
+LOGIN_URL = 'comptes:login' # If you want to override the default /accounts/login/
 
 DEBUG = True
 

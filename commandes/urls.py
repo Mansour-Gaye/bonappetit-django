@@ -23,6 +23,8 @@ urlpatterns = [
     path('panier/ajouter/<int:menu_id>/', views.ajouter_au_panier, name='ajouter_au_panier'),
     path('panier/supprimer/<int:menu_id>/', views.supprimer_du_panier, name='supprimer_du_panier'),
     path('panier/vider/', views.vider_panier, name='vider_panier'),
-    path('panier/count/', views.get_cart_count, name='get_cart_count'),
+    path('panier/count/', views.get_cart_count, name='get_cart_item_count'),
     path('panier/modal/', views.cart_modal_content, name='cart_modal_content'),
+    path('panier/update_item/<int:menu_id>/', views.update_cart_item, name='update_cart_item'),
+    path('panier/remove_item/<int:menu_id>/', views.remove_cart_item, name='remove_cart_item'),
 ]

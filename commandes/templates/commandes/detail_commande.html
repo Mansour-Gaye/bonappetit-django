@@ -125,9 +125,12 @@
 
                 {% if commande.etat == 'EN_ATTENTE' %}
                 <div class="d-grid gap-2">
-                    <a href="{% url 'commandes:annuler_commande' commande.id %}" class="btn btn-danger">
-                        <i class="fas fa-times-circle me-2"></i>Annuler la commande
-                    </a>
+                    <form method="post" action="{% url 'commandes:annuler_commande' commande.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-times-circle me-2"></i>Annuler la commande
+                        </button>
+                    </form>
                 </div>
                 {% endif %}
             </div>

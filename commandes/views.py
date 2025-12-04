@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.db import transaction
 from .models import Commande, LigneCommande
 from menus.models import Menu, Categorie
-from comptes.models import Notification
+from comptes.models import Notification, CustomUser
 from django.http import JsonResponse, HttpResponse
 from django.urls import reverse
 from django.utils import timezone
@@ -52,16 +52,38 @@ def update_commande_status_view(request, commande_id):
         if new_status in [choice[0] for choice in Commande.ETAT_CHOICES]:
             commande.etat = new_status
             commande.save()
-
-            # Create notification for the client
-            client_user = commande.client
-            if new_status == 'RETIREE':
-                message_text = f"Votre commande #{commande.id} a été retirée avec succès ! Elle a été déplacée vers votre historique des commandes."
-            else:
-                message_text = f"Le statut de votre commande #{commande.id} a été mis à jour de '{old_status}' à '{commande.get_etat_display()}'."
-            Notification.objects.create(user=client_user, message=message_text)
-
-            messages.success(request, f"Le statut de la commande #{commande.id} a été mis à jour et le client notifié.")
+            # Notifications client (persistantes)
+            client = commande.client
+            notif_msg = None
+            notif_type = 'commande'
+            notif_icon = 'fas fa-bell'
+            if new_status == 'EN_PREPARATION':
+                notif_msg = f"Votre commande #{commande.id} est en cours de préparation."
+                notif_icon = 'fas fa-hourglass-half'
+            elif new_status == 'PRETE':
+                notif_msg = f"Votre commande #{commande.id} est prête à être retirée !"
+                notif_icon = 'fas fa-check-circle'
+            elif new_status == 'RETIREE':
+                notif_msg = f"Merci d'avoir retiré votre commande #{commande.id}."
+                notif_icon = 'fas fa-box-open'
+            elif new_status == 'ANNULEE':
+                notif_msg = f"Votre commande #{commande.id} a été annulée."
+                notif_icon = 'fas fa-times-circle'
+            elif new_status == 'CONFIRMEE':
+                notif_msg = f"Votre commande #{commande.id} a été confirmée."
+                notif_icon = 'fas fa-clipboard-check'
+            if notif_msg:
+                Notification.create_notification(user=client, message=notif_msg, type_notification=notif_type, icon=notif_icon)
+            # Notifications gestionnaire (persistantes)
+            if new_status == 'EN_ATTENTE':
+                for gestionnaire in CustomUser.objects.filter(is_gestionnaire=True):
+                    Notification.create_notification(user=gestionnaire, message=f"Nouvelle commande #{commande.id} reçue de {commande.client.username}.", type_notification='commande', icon='fas fa-shopping-cart')
+            elif new_status == 'ANNULEE':
+                for gestionnaire in CustomUser.objects.filter(is_gestionnaire=True):
+                    Notification.create_notification(user=gestionnaire, message=f"La commande #{commande.id} a été annulée par {commande.client.username}.", type_notification='commande', icon='fas fa-times-circle')
+            # Feedback immédiat (messages Django)
+            if notif_msg:
+                messages.info(request, notif_msg)
             return redirect('commandes:list_all_commandes')
         else:
             messages.error(request, "Statut invalide.")
@@ -74,7 +96,7 @@ def liste_commandes(request):
         client=request.user,
         etat__in=['EN_ATTENTE', 'EN_PREPARATION', 'PRETE']
     ).prefetch_related('lignes').order_by('-date_commande')
-    return render(request, 'commandes/liste_commandes_restaurantly.html', {'commandes': commandes})
+    return render(request, 'commandes/liste_commandes.html', {'commandes': commandes})
 
 @client_required
 @login_required
@@ -83,7 +105,7 @@ def historique_commandes(request):
         client=request.user,
         etat__in=['RETIREE', 'ANNULEE']
     ).prefetch_related('lignes').order_by('-date_commande')
-    return render(request, 'commandes/historique_commandes_restaurantly.html', {'commandes': commandes})
+    return render(request, 'commandes/historique_commandes.html', {'commandes': commandes})
 
 @client_required
 @login_required
@@ -161,8 +183,6 @@ def calcul_sous_total(menu_id, panier):
     menu = Menu.objects.get(id_menu=menu_id)
     return menu.prix * quantite
 
-@client_required
-@login_required
 def voir_panier(request):
     panier = request.session.get('panier', {})
     items = []
@@ -186,41 +206,22 @@ def voir_panier(request):
         'total': total
     })
 
-@login_required(login_url='comptes:login')
 def ajouter_au_panier(request, menu_id):
     if request.method == 'POST':
         panier = request.session.get('panier', {})
         try:
-            data = json.loads(request.body)
-            quantite = data.get('quantite', 0)
-        except Exception:
-            quantite = 0
-            
+            quantite = int(request.POST.get('quantite', 1))
+            if quantite <= 0:
+                quantite = 1
+        except (ValueError, TypeError):
+            quantite = 1
         menu_id = str(menu_id)
-        if menu_id in panier:
-            panier[menu_id] += quantite
-            if panier[menu_id] <= 0:
-                del panier[menu_id]
-        else:
-            if quantite > 0:
-                panier[menu_id] = quantite
-                
+        panier[menu_id] = panier.get(menu_id, 0) + quantite
         request.session['panier'] = panier
-        request.session.modified = True  # Important pour s'assurer que la session est sauvegardée
-        
-        total = calcul_total(panier)
-        sous_total = calcul_sous_total(menu_id, panier)
-        
-        return JsonResponse({
-            'success': True,
-            'quantite': panier.get(menu_id, 0),
-            'sous_total': sous_total,
-            'total': total
-        })
-    return JsonResponse({'success': False, 'message': 'Méthode non autorisée.'})
+        cart_count = sum(panier.values())
+        return JsonResponse({'status': 'success', 'message': 'Article ajouté!', 'cart_count': cart_count})
+    return JsonResponse({'status': 'error', 'message': 'Requête invalide'}, status=400)
 
-@client_required
-@login_required
 def supprimer_du_panier(request, menu_id):
     if request.method == 'POST':
         panier = request.session.get('panier', {})
@@ -236,9 +237,6 @@ def supprimer_du_panier(request, menu_id):
         return JsonResponse({'success': False, 'message': "L'article n'était pas dans le panier."})
     return JsonResponse({'success': False, 'message': 'Méthode non autorisée.'})
 
-@client_required
-@require_POST
-@login_required
 def vider_panier(request):
     if 'panier' in request.session:
         request.session['panier'] = {}
@@ -256,37 +254,30 @@ def nouvelle_commande(request):
         return redirect('commandes:liste_commandes')
     
     if request.method == 'POST':
-        # Créer la commande
         commande = Commande.objects.create(
             client=request.user,
             date_commande=timezone.now(),
             etat='EN_ATTENTE',
-            montant_total=0  # Sera mis à jour après l'ajout des lignes
+            montant_total=0
         )
-        
         montant_total = 0
-        
-        # Ajouter les lignes de commande
         for menu_id, quantite in panier.items():
             menu = get_object_or_404(Menu, id_menu=menu_id)
             sous_total = menu.prix * quantite
             montant_total += sous_total
-            
             LigneCommande.objects.create(
                 commande=commande,
                 menu=menu,
                 quantite=quantite,
                 prix_unitaire=menu.prix
             )
-        
-        # Mettre à jour le montant total de la commande
         commande.montant_total = montant_total
         commande.save()
-        
-        # Vider le panier
         del request.session['panier']
-        
         messages.success(request, "Votre commande a été enregistrée avec succès.")
+        # Notifier tous les gestionnaires d'une nouvelle commande
+        for gestionnaire in CustomUser.objects.filter(is_gestionnaire=True):
+            Notification.create_notification(user=gestionnaire, message=f"Nouvelle commande #{commande.id} reçue de {request.user.username}.", type_notification='commande', icon='fas fa-shopping-cart')
         return redirect('commandes:liste_commandes')
     
     # Préparer les données pour l'affichage
@@ -311,16 +302,10 @@ def nouvelle_commande(request):
 @login_required(login_url='comptes:login')
 def detail_commande(request, commande_id):
     commande = get_object_or_404(Commande, id=commande_id)
-    
-    # Vérifier si l'utilisateur est autorisé à voir cette commande
     if not request.user.is_staff and commande.client != request.user:
         messages.error(request, "Vous n'êtes pas autorisé à voir cette commande.")
         return redirect('commandes:liste_commandes')
-    
-    # Récupérer les lignes de commande
     lignes = LigneCommande.objects.filter(commande=commande).select_related('menu')
-    
-    # Préparer les données pour l'affichage
     items = []
     for ligne in lignes:
         items.append({
@@ -329,8 +314,7 @@ def detail_commande(request, commande_id):
             'prix_unitaire': ligne.prix_unitaire,
             'sous_total': ligne.quantite * ligne.prix_unitaire
         })
-    
-    return render(request, 'commandes/detail_commande_restaurantly.html', {
+    return render(request, 'commandes/detail_commande.html', {
         'commande': commande,
         'items': items,
         'total': commande.montant_total
@@ -340,7 +324,7 @@ def detail_commande(request, commande_id):
 @login_required(login_url='comptes:login')
 def annuler_commande(request, commande_id):
     commande = get_object_or_404(Commande, id=commande_id)
-    if commande.client != request.user and not request.user.is_staff:
+    if commande.client != request.user:
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'success': False, 'message': "Non autorisé."}, status=403)
         messages.error(request, "Vous n'êtes pas autorisé à annuler cette commande.")
@@ -352,40 +336,35 @@ def annuler_commande(request, commande_id):
         return redirect('commandes:detail_commande', commande_id=commande.id)
     commande.etat = 'ANNULEE'
     commande.save()
+    # Notification client (persistante)
+    Notification.create_notification(user=request.user, message=f"Votre commande #{commande.id} a été annulée.", type_notification='commande', icon='fas fa-times-circle')
+    # Notification gestionnaire (persistante)
+    for gestionnaire in CustomUser.objects.filter(is_gestionnaire=True):
+        Notification.create_notification(user=gestionnaire, message=f"La commande #{commande.id} a été annulée par {request.user.username}.", type_notification='commande', icon='fas fa-times-circle')
+    messages.success(request, f"Votre commande #{commande.id} a été annulée.")
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        return JsonResponse({'success': True, 'message': "Commande annulée."})
-    messages.success(request, "La commande a été annulée avec succès.")
+        return JsonResponse({'success': True, 'message': f"Commande #{commande.id} annulée."})
     return redirect('commandes:detail_commande', commande_id=commande.id)
 
 @login_required(login_url='comptes:login')
 def confirmer_commande(request, commande_id):
     commande = get_object_or_404(Commande, id=commande_id)
-    
-    # Vérifier si l'utilisateur est autorisé à confirmer cette commande
     if not request.user.is_staff and commande.client != request.user:
         messages.error(request, "Vous n'êtes pas autorisé à confirmer cette commande.")
         return redirect('commandes:liste_commandes')
-    
-    # Vérifier si la commande peut être confirmée
     if commande.etat != 'EN_ATTENTE':
         messages.error(request, "Cette commande ne peut plus être confirmée.")
         return redirect('commandes:detail_commande', commande_id=commande.id)
-    
-    # Confirmer la commande
     commande.etat = 'CONFIRMEE'
     commande.save()
-    
-    messages.success(request, "La commande a été confirmée avec succès.")
+    messages.success(request, "Votre commande a bien été confirmée. Elle sera traitée dans les plus brefs délais.")
     return redirect('commandes:detail_commande', commande_id=commande.id)
 
-@login_required(login_url='comptes:login')
 def get_cart_count(request):
     panier = request.session.get('panier', {})
     count = sum(panier.values())
     return JsonResponse({'count': count})
 
-@client_required
-@login_required
 def cart_modal_content(request):
     panier = request.session.get('panier', {})
     items = []
@@ -404,13 +383,11 @@ def cart_modal_content(request):
         except Menu.DoesNotExist:
             continue
     
-    return render(request, 'commandes/cart_modal_content_restaurantly.html', {
+    return render(request, 'commandes/partials/cart_modal_content.html', {
         'items': items,
         'total': total
     })
 
-@client_required
-@login_required
 def modal_panier_partial(request):
     panier = request.session.get('panier', {})
     items = []
@@ -428,3 +405,34 @@ def modal_panier_partial(request):
         'items': items,
         'total': total
     })
+
+def update_cart_item(request, menu_id):
+    panier = request.session.get('panier', {})
+    menu_id = str(menu_id)
+    
+    try:
+        data = json.loads(request.body)
+        action = data.get('action')
+
+        if action == 'increase':
+            panier[menu_id] = panier.get(menu_id, 0) + 1
+        elif action == 'decrease':
+            panier[menu_id] = panier.get(menu_id, 0) - 1
+            if panier[menu_id] <= 0:
+                del panier[menu_id]
+        
+        request.session['panier'] = panier
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+def remove_cart_item(request, menu_id):
+    panier = request.session.get('panier', {})
+    menu_id = str(menu_id)
+    
+    if menu_id in panier:
+        del panier[menu_id]
+        request.session['panier'] = panier
+        return JsonResponse({'status': 'success'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Article non trouvé'}, status=404)

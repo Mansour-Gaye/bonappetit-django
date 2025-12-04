@@ -1,0 +1,241 @@
+/* Notifications Bootstrap custom */
+#notification-container {
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  left: auto;
+  width: auto;
+  min-width: 340px;
+  max-width: 420px;
+  z-index: 1080;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.notification-alert {
+  animation: fadeInRight 0.7s;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+  border-radius: 0.85rem;
+  padding: 1.1rem 1.7rem 1.1rem 1.2rem;
+  font-size: 1.05rem;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  letter-spacing: 0.01em;
+  min-width: 320px;
+  max-width: 400px;
+  margin-bottom: 0.7rem;
+  margin-left: auto;
+  margin-right: 0;
+  background-clip: padding-box;
+  pointer-events: auto;
+  border: none;
+}
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(60px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.fade-out {
+  opacity: 0 !important;
+  transition: opacity 0.6s;
+}
+/* Badge de notifications dans la navbar */
+#notification-badge {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.1rem;
+  font-size: 0.75rem;
+  background: #dc3545;
+  color: #fff;
+  border-radius: 50%;
+  padding: 0.18em 0.45em;
+  font-weight: bold;
+  z-index: 2;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+  transition: background 0.2s;
+}
+#notification-badge.new {
+  background: #ffc107;
+  color: #212529;
+}
+@media (max-width: 576px) {
+  #notification-container {
+    top: 56px;
+    right: 2vw;
+    min-width: 90vw;
+    max-width: 98vw;
+    align-items: flex-end;
+  }
+  .notification-alert {
+    min-width: 90vw;
+    max-width: 98vw;
+    padding: 0.7rem 0.5rem;
+    font-size: 0.97rem;
+  }
+}
+.notification-message {
+  line-height: 1.5;
+  font-size: 1.05rem;
+  color: #222;
+}
+.alert .fw-bold.small {
+  font-size: 0.93rem;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.1rem;
+}
+
+/* Notifications Dropdown Card Style */
+#notification-dropdown .card {
+  border-radius: 1rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.13);
+  background: #fff;
+}
+#notification-dropdown .card-header {
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 0.75rem 1.25rem;
+}
+#notification-dropdown .card-body {
+  padding: 0;
+  max-height: 320px;
+  overflow-y: auto;
+}
+#notification-dropdown .list-group-item {
+  background: #f8f9fa;
+  border: none;
+  border-bottom: 1px solid #f0f0f0;
+  border-radius: 0;
+  transition: background 0.2s;
+}
+#notification-dropdown .list-group-item:last-child {
+  border-bottom: none;
+}
+#notification-dropdown .list-group-item:hover {
+  background: #e9ecef;
+}
+#notification-dropdown .fw-semibold {
+  font-weight: 600;
+}
+#notification-dropdown .btn-outline-primary {
+  font-size: 0.92rem;
+  padding: 0.2rem 0.7rem;
+}
+#notification-dropdown .btn-outline-secondary {
+  font-size: 0.92rem;
+  padding: 0.2rem 0.7rem;
+}
+#notification-dropdown .text-muted {
+  font-size: 0.93rem;
+}
+#notification-dropdown .card-header .btn {
+  margin-left: 0.5rem;
+}
+#notification-dropdown::-webkit-scrollbar {
+  width: 7px;
+}
+#notification-dropdown::-webkit-scrollbar-thumb {
+  background: #e0e0e0;
+  border-radius: 4px;
+}
+@media (max-width: 576px) {
+  #notification-dropdown {
+    min-width: 95vw !important;
+    max-width: 99vw !important;
+  }
+  #notification-dropdown .card {
+    border-radius: 0.7rem;
+  }
+}
+
+/* Notifications Modal Card Style */
+#notificationsModal .modal-dialog {
+  max-width: 420px;
+  min-width: 340px;
+}
+#notificationsModal .modal-content {
+  border-radius: 1rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.13);
+  background: #fff;
+}
+#notificationsModal .modal-header {
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 0.75rem 1.25rem;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+#notificationsModal .modal-body {
+  padding: 0;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+#notificationsModal .list-group-item {
+  background: #f8f9fa;
+  border: none;
+  border-bottom: 1px solid #f0f0f0;
+  border-radius: 0;
+  transition: background 0.2s;
+}
+#notificationsModal .list-group-item:last-child {
+  border-bottom: none;
+}
+#notificationsModal .list-group-item:hover {
+  background: #e9ecef;
+}
+#notificationsModal .fw-semibold {
+  font-weight: 600;
+}
+#notificationsModal .btn-outline-primary {
+  font-size: 0.92rem;
+  padding: 0.2rem 0.7rem;
+}
+#notificationsModal .btn-outline-secondary {
+  font-size: 0.92rem;
+  padding: 0.2rem 0.7rem;
+}
+#notificationsModal .text-muted {
+  font-size: 0.93rem;
+}
+#notificationsModal .modal-header .btn {
+  margin-left: 0.5rem;
+}
+#notificationsModal .modal-body::-webkit-scrollbar {
+  width: 7px;
+}
+#notificationsModal .modal-body::-webkit-scrollbar-thumb {
+  background: #e0e0e0;
+  border-radius: 4px;
+}
+@media (max-width: 576px) {
+  #notificationsModal .modal-dialog {
+    min-width: 95vw !important;
+    max-width: 99vw !important;
+    margin: 0;
+  }
+  #notificationsModal .modal-content {
+    border-radius: 0.7rem;
+  }
+}
+
+#notification-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1050;
+  display: none;
+}
+#notificationsModal.show {
+  z-index: 1060 !important;
+}
+#notificationsModal .modal-content {
+  background: #fff;
+  filter: none !important;
+  opacity: 1 !important;
+  z-index: 1070;
+  position: relative;
+} 

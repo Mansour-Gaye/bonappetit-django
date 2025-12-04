@@ -18,14 +18,16 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from comptes.views import home # This line might become redundant if home is only accessed via comptes.urls
+from comptes.views import mark_all_notifications_read
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', home, name='home'), # Root home page
-    path('comptes/', include('comptes.urls')), # Authentication app URLs
+    path('', include('comptes.urls')),  # Include comptes URLs at root level
     path('menu/', include('menus.urls')),
-    path('commandes/', include('commandes.urls')), # Commandes app URLs
+    path('commandes/', include('commandes.urls')),  # Commandes app URLs
+    path('notifications/mark_all_read/', mark_all_notifications_read, name='mark_all_notifications_read'),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

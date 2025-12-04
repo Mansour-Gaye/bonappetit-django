@@ -12,25 +12,77 @@
         padding: 20px;
         margin-bottom: 20px;
     }
-    .order-item {
-        border-bottom: 1px solid #eee;
-        padding: 10px 0;
+    .order-table th, .order-table td {
+        vertical-align: middle;
+        text-align: center;
     }
-    .order-item:last-child {
-        border-bottom: none;
+    .order-table img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 6px;
     }
-    .order-total {
-        background-color: var(--accent-color);
-        color: white;
-        padding: 20px;
-        border-radius: 10px;
-        margin-top: 20px;
+    .order-total-box {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        padding: 28px 24px 24px 24px;
+        margin-top: 40px;
+        min-width: 270px;
+        max-width: 340px;
+        margin-left: auto;
+        margin-right: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
-    .delivery-info {
-        background-color: #f8f9fa;
-        border-radius: 10px;
-        padding: 20px;
-        margin-bottom: 20px;
+    .order-total-box h5 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 18px;
+        color: #222;
+    }
+    .order-total-box .summary-row {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 1rem;
+    }
+    .order-total-box .summary-row.total {
+        font-weight: bold;
+        font-size: 1.1rem;
+        margin-top: 10px;
+        margin-bottom: 18px;
+    }
+    .order-total-box hr {
+        width: 100%;
+        margin: 12px 0;
+    }
+    .btn-confirm {
+        width: 100%;
+        font-size: 1.1rem;
+        padding: 12px 0;
+        border-radius: 8px;
+        background: #f3f4f6;
+        color: #222;
+        font-weight: 600;
+        border: 1.5px solid #d1d5db;
+        box-shadow: none;
+        transition: background 0.18s, color 0.18s, border 0.18s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.7em;
+        letter-spacing: 0.5px;
+    }
+    .btn-confirm:hover, .btn-confirm:focus {
+        background: #e5e7eb;
+        color: #111;
+        border-color: #bfc3c9;
+    }
+    .btn-confirm i {
+        font-size: 1.2em;
     }
 </style>
 {% endblock %}
@@ -52,55 +104,68 @@
 
             <div class="order-summary">
                 <h4 class="mb-3"><i class="fas fa-shopping-basket me-2"></i>Récapitulatif de la commande</h4>
-                {% for item in items %}
-                <div class="order-item">
-                    <div class="row align-items-center">
-                        <div class="col-md-2">
-                            {% if item.menu.image %}
-                            <img src="{{ item.menu.image.url }}" alt="{{ item.menu.nom }}" class="img-fluid rounded">
-                            {% else %}
-                            <img src="{% static 'images/placeholder-menu.jpg' %}" alt="{{ item.menu.nom }}" class="img-fluid rounded">
-                            {% endif %}
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="mb-1">{{ item.menu.nom }}</h6>
-                            <p class="text-muted mb-0">{{ item.menu.categorie.nom }}</p>
-                        </div>
-                        <div class="col-md-2 text-center">
-                            <span class="badge bg-light text-dark">x{{ item.quantite }}</span>
-                        </div>
-                        <div class="col-md-2 text-end">
-                            <p class="mb-0">{{ item.sous_total }} FCFA</p>
-                        </div>
-                    </div>
+                <div class="table-responsive">
+                  <table class="table order-table align-middle">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Image</th>
+                        <th>Nom</th>
+                        <th>Catégorie</th>
+                        <th>Quantité</th>
+                        <th>Prix unitaire</th>
+                        <th>Sous-total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for item in items %}
+                      <tr>
+                        <td>
+                          {% if item.menu.image %}
+                            <img src="{{ item.menu.image.url }}" alt="{{ item.menu.nom }}">
+                          {% else %}
+                            <img src="{% static 'images/placeholder-menu.jpg' %}" alt="{{ item.menu.nom }}">
+                          {% endif %}
+                        </td>
+                        <td><strong>{{ item.menu.nom }}</strong></td>
+                        <td>{{ item.menu.categorie.nom }}</td>
+                        <td>x{{ item.quantite }}</td>
+                        <td>{{ item.menu.prix }} FCFA</td>
+                        <td>{{ item.sous_total }} FCFA</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <th colspan="5" class="text-end">Total</th>
+                        <th>{{ total }} FCFA</th>
+                      </tr>
+                    </tfoot>
+                  </table>
                 </div>
-                {% endfor %}
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="order-total">
-                <h4 class="mb-3">Total de la commande</h4>
-                <div class="d-flex justify-content-between mb-3">
+        <div class="col-md-4 d-flex align-items-center justify-content-center">
+            <div class="order-total-box">
+                <h5>Total de la commande</h5>
+                <div class="summary-row">
                     <span>Sous-total</span>
                     <span>{{ total }} FCFA</span>
                 </div>
-                <div class="d-flex justify-content-between mb-3">
+                <div class="summary-row">
                     <span>Frais de livraison</span>
                     <span>Gratuit</span>
                 </div>
                 <hr>
-                <div class="d-flex justify-content-between mb-4">
-                    <strong>Total</strong>
-                    <strong>{{ total }} FCFA</strong>
+                <div class="summary-row total">
+                    <span>Total</span>
+                    <span>{{ total }} FCFA</span>
                 </div>
-                <form method="post">
+                <form method="post" class="w-100">
                     {% csrf_token %}
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-light">
-                            <i class="fas fa-check-circle me-2"></i>Confirmer la commande
-                        </button>
-                    </div>
+                    <button type="submit" class="btn-confirm mt-2">
+                        Confirmer la commande
+                    </button>
                 </form>
             </div>
         </div>
